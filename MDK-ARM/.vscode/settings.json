@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "freertos.h": "c",
+        "task.h": "c",
+        "main.h": "c",
+        "queue.h": "c",
+        "cmsis_os.h": "c",
+        "screen.h": "c",
+        "stdint.h": "c",
+        "tmc5130.h": "c",
+        "usart.h": "c"
+    }
+}
