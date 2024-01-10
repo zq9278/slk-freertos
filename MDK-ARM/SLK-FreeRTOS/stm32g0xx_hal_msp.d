@@ -55,5 +55,8 @@ slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMS
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/tmc5130.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Core/Inc/main.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/Screen.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Core/Inc/usart.h
 slk-freertos\stm32g0xx_hal_msp.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h

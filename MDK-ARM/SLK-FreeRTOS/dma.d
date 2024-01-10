@@ -56,5 +56,8 @@ slk-freertos\dma.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cms
 slk-freertos\dma.o: ../Hardware/Inc/tmc5130.h
 slk-freertos\dma.o: ../Core/Inc/main.h
 slk-freertos\dma.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
+slk-freertos\dma.o: ../Hardware/Inc/Screen.h
 slk-freertos\dma.o: ../Core/Inc/usart.h
 slk-freertos\dma.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
+slk-freertos\dma.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
+slk-freertos\dma.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h

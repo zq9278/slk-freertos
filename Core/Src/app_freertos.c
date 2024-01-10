@@ -1,6 +1,5 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
  * File Name          : app_freertos.c
  * Description        : Code for freertos applications
  ******************************************************************************
@@ -45,35 +44,33 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-uint8_t buffer[10];
-//QueueHandle_t dataQueue = NULL;
+
+uint8_t buffer[100];
+EventGroupHandle_t xEventGroup;
+const char *str1 = "queue";
 /* USER CODE END Variables */
 /* Definitions for Moto_Task */
 osThreadId_t Moto_TaskHandle;
 const osThreadAttr_t Moto_Task_attributes = {
-  .name = "Moto_Task",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 130 * 4
-};
+    .name = "Moto_Task",
+    .priority = (osPriority_t)osPriorityNormal,
+    .stack_size = 128 * 4};
 /* Definitions for myTask02 */
 osThreadId_t myTask02Handle;
 const osThreadAttr_t myTask02_attributes = {
-  .name = "myTask02",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 130 * 4
-};
+    .name = "myTask02",
+    .priority = (osPriority_t)osPriorityNormal,
+    .stack_size = 128 * 4};
 /* Definitions for Uart_ProcessTas */
 osThreadId_t Uart_ProcessTasHandle;
 const osThreadAttr_t Uart_ProcessTas_attributes = {
-  .name = "Uart_ProcessTas",
-  .priority = (osPriority_t) osPriorityNormal,
-  .stack_size = 200 * 4
-};
+    .name = "Uart_ProcessTas",
+    .priority = (osPriority_t)osPriorityNormal,
+    .stack_size = 130 * 4};
 /* Definitions for dataQueue */
 osMessageQueueId_t dataQueueHandle;
 const osMessageQueueAttr_t dataQueue_attributes = {
-  .name = "dataQueue"
-};
+    .name = "dataQueue"};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -87,11 +84,12 @@ void App_Uart_ProcessTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -110,7 +108,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the queue(s) */
   /* creation of dataQueue */
-  dataQueueHandle = osMessageQueueNew (16, sizeof(buffer), &dataQueue_attributes);
+  dataQueueHandle = osMessageQueueNew(3, sizeof(buffer), &dataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -132,8 +130,9 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
+  xEventGroup = xEventGroupCreate();
 
+  /* USER CODE END RTOS_EVENTS */
 }
 
 /* USER CODE BEGIN Header_AppMoto_Task */
@@ -147,12 +146,12 @@ void AppMoto_Task(void *argument)
 {
   /* USER CODE BEGIN AppMoto_Task */
   TMC5130_Init();
-  HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET);//使能tmc电机引脚
-  TMC5130_Write(0xa7, 0x20000);//设置tmc电机速度
+  HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+  TMC5130_Write(0xa7, 0x20000);                                      // 设置tmc电机速度
   /* Infinite loop */
   for (;;)
   {
-    TMC5130_Write(0xa0, 1);//设置tmc电机方向向前
+    TMC5130_Write(0xa0, 1); // 设置tmc电机方向向前
     vTaskDelay(1000);
     TMC5130_Write(0xa0, 2);
     vTaskDelay(1000);
@@ -171,10 +170,27 @@ void StartTask02(void *argument)
 {
   /* USER CODE BEGIN StartTask02 */
   /* Infinite loop */
+  EventBits_t uxBits; // 定义事件组等待位
+  const EventBits_t xBitsToWaitFor = BIT_0;
   for (;;)
   {
-    vTaskDelay(50);
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
+   
+
+    uxBits = xEventGroupWaitBits(
+        xEventGroup,    // 事件组句柄
+        xBitsToWaitFor, // 要等待的位
+        // BIT_0 | BIT_1,           // 要等待的位
+        //pdTRUE, // 函数返回时清除这些位
+        pdFALSE, // 函数返回时是否清除这些位
+        pdTRUE, // 是否等待所有位
+        portMAX_DELAY     // 是否无限期等
+    );
+    if ((uxBits & BIT_0) == BIT_0)
+    {
+      // BIT_0 和 BIT_1 都被设置
+      vTaskDelay(100);
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+    }
   }
   /* USER CODE END StartTask02 */
 }
@@ -190,18 +206,16 @@ void App_Uart_ProcessTask(void *argument)
 {
   /* USER CODE BEGIN App_Uart_ProcessTask */
   /* Infinite loop */
+
   for (;;)
   {
-    vTaskDelay(100);
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
-    if (xQueueReceive(dataQueueHandle, buffer, portMAX_DELAY))//阻塞接受队列消息
+     vTaskDelay(500);
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
+    if (xQueueReceive(dataQueueHandle, buffer, 100)) // 阻塞接受队列消息
     {
-     printf("%s",buffer);
+      processData((PCTRL_MSG)buffer); // 处理接收到的数据
     }
-     // 处理接收到的数据
-      //processData(buffer);
-      // unsigned short size=queue_find_cmd(buffer,CMD_MAX_SIZE);
-      // processData(PCTRL_MSG msg, uint16_t size)
+    // if ((uxBits & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
   }
   /* USER CODE END App_Uart_ProcessTask */
 }
@@ -210,4 +224,3 @@ void App_Uart_ProcessTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

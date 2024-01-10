@@ -8,6 +8,16 @@
         "screen.h": "c",
         "stdint.h": "c",
         "tmc5130.h": "c",
-        "usart.h": "c"
+        "usart.h": "c",
+        "functional": "c",
+        "optional": "c",
+        "istream": "c",
+        "ostream": "c",
+        "system_error": "c",
+        "array": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "dma.h": "c"
     }
 }
