@@ -45,6 +45,7 @@ typedef struct
 } CTRL_MSG, *PCTRL_MSG;
 
 void processData(PCTRL_MSG msg);
+void ScreenUpdateTemperature(float value,uint16_t work_mode);
 
 // 在这里放置你的函数声明、类型定义等
 

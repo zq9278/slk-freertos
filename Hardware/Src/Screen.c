@@ -5,7 +5,11 @@
 uint8_t cmd_buffer[CMD_MAX_SIZE]; // 指令缓存
 
 extern  EventGroupHandle_t xEventGroup;
+extern  TIM_HandleTypeDef htim14;
+extern DMA_HandleTypeDef hdma_usart1_tx;
 const EventBits_t xBitsToSet = BIT_0;
+const EventBits_t xBitsToSet1 = BIT_1;
+uint8_t SendBuff[12];
 
 void processData(PCTRL_MSG msg)
 {
@@ -44,17 +48,15 @@ void processData(PCTRL_MSG msg)
         /*热敷开始*/
 
     case 0x1041:
-        // Hot_Value=msg->data
-         xEventGroupSetBits( xEventGroup, xBitsToSet );
-        
+         xEventGroupSetBits( xEventGroup, xBitsToSet );//设定任务开启标志位
+         HAL_TIM_PWM_Start(&htim14,TIM_CHANNEL_1);
         break;
 
-        // /*热敷结束*/
-        // case 0x1030:
-        // 	WorkMode=0;
-        // 	HeatPower(OFF);
-        // 	HeatPWMVal=0;
-        // 	break;
+        /*热敷结束*/
+        case 0x1030:
+        	xEventGroupClearBits( xEventGroup, xBitsToSet );//清除任务开启标志位
+            //发送停止位
+        	break;
 
         // /*脉动开始*/
         // case 0x1005:
@@ -94,3 +96,37 @@ void processData(PCTRL_MSG msg)
         break;
     }
 }
+
+
+void ScreenUpdateTemperature(float value,uint16_t work_mode)
+{
+	uint16_t Tmpvalue;
+	
+	Tmpvalue=value+0.5f;
+	while(hdma_usart1_tx.State!=HAL_DMA_STATE_READY);
+
+    // SendBuff[4]=0x03;
+    // SendBuff[6]=0x02;
+
+    // SendBuff[4]=0x0C;
+    // SendBuff[6]=0x03;
+    SendBuff[4] = (work_mode >> 8) & 0xFF; // 高字节
+    SendBuff[6] = work_mode & 0xFF;        // 低字节
+	
+	SendBuff[0]=0xEE;
+	SendBuff[1]=0xB1;
+	SendBuff[2]=0x10;
+	SendBuff[3]=0x00;
+	
+	SendBuff[5]=0x00;
+	
+	SendBuff[7]=Tmpvalue/10+'0';
+	SendBuff[8]=Tmpvalue%10+'0';
+	SendBuff[9]=0xFF;
+	SendBuff[10]=0xFC;
+	SendBuff[11]=0xFF;
+	SendBuff[12]=0xFF;
+	
+	HAL_UART_Transmit_DMA(&huart1,SendBuff,13);
+}
+

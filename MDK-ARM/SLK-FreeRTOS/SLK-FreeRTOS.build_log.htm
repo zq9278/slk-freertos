@@ -21,20 +21,22 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.9.0
 Dialog DLL:      TARMCM1.DLL V1.14.4.0
  
 <h2>Project:</h2>
-d:\STM32_CODE\slk-freertos\MDK-ARM\SLK-FreeRTOS.uvprojx
+D:\STM32_CODE\slk-freertos\MDK-ARM\SLK-FreeRTOS.uvprojx
 Project File Date:  01/10/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\SoftWare\Keil\ARM\ARMCC\Bin'
 Build target 'SLK-FreeRTOS'
 compiling app_freertos.c...
-../Hardware/Inc/Screen.h(51): warning:  #1-D: last line of file ends without a newline
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
   #endif // 结束 #ifndef �?
-../Core/Src/app_freertos.c: 1 warning, 0 errors
+../Core/Src/app_freertos.c(205): warning:  #870-D: invalid multibyte character sequence
+        printf("温度�?%f\n", EyeTmp);
+../Core/Src/app_freertos.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=21124 RO-data=536 RW-data=160 ZI-data=8896  
+Program Size: Code=29612 RO-data=536 RW-data=176 ZI-data=8944  
 FromELF: creating hex file...
-"SLK-FreeRTOS\SLK-FreeRTOS.axf" - 0 Error(s), 1 Warning(s).
+"SLK-FreeRTOS\SLK-FreeRTOS.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -58,7 +60,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

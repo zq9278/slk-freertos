@@ -134,9 +134,16 @@ void Error_Handler(void);
 #include "usart.h"
 #include <stdio.h>
 #include "event_groups.h"
+#include "stm32g0xx_hal.h"
+#include "pid.h"
+#include "tmp114.h"
+
 #define BIT_0 (1 << 0)
 #define BIT_1 (1 << 1)
+
+#define TMP114Address		0x90
 //#include "retarget.h"
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

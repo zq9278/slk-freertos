@@ -61,3 +61,5 @@ slk-freertos\tmc5130.o: ../Core/Inc/usart.h
 slk-freertos\tmc5130.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 slk-freertos\tmc5130.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 slk-freertos\tmc5130.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+slk-freertos\tmc5130.o: ../Hardware/Inc/pid.h
+slk-freertos\tmc5130.o: ../Hardware/Inc/tmp114.h

@@ -18,6 +18,8 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c",
-        "dma.h": "c"
+        "dma.h": "c",
+        "stm32g0xx_hal.h": "c",
+        "limits": "c"
     }
 }

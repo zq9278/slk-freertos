@@ -61,3 +61,5 @@ slk-freertos\spi.o: ../Core/Inc/usart.h
 slk-freertos\spi.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 slk-freertos\spi.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 slk-freertos\spi.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+slk-freertos\spi.o: ../Hardware/Inc/pid.h
+slk-freertos\spi.o: ../Hardware/Inc/tmp114.h

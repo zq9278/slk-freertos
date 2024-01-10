@@ -47,7 +47,16 @@
 
 uint8_t buffer[100];
 EventGroupHandle_t xEventGroup;
+extern TIM_HandleTypeDef htim14;
+extern uint8_t HeatPWMVal;
+
+extern uint8_t EyeTmpRaw[2];
+extern float EyeTmp;
+
+extern PID_typedef HeatPID;
+
 const char *str1 = "queue";
+char HeatPWMVal_str[3];
 /* USER CODE END Variables */
 /* Definitions for Moto_Task */
 osThreadId_t Moto_TaskHandle;
@@ -130,7 +139,7 @@ void MX_FREERTOS_Init(void)
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
-  xEventGroup = xEventGroupCreate();
+  xEventGroup = xEventGroupCreate(); // 创建事件�?
 
   /* USER CODE END RTOS_EVENTS */
 }
@@ -172,24 +181,33 @@ void StartTask02(void *argument)
   /* Infinite loop */
   EventBits_t uxBits; // 定义事件组等待位
   const EventBits_t xBitsToWaitFor = BIT_0;
+   
+  HeatPIDInit();
+  TMP114_Init();
   for (;;)
   {
-   
-
-    uxBits = xEventGroupWaitBits(
-        xEventGroup,    // 事件组句柄
-        xBitsToWaitFor, // 要等待的位
-        // BIT_0 | BIT_1,           // 要等待的位
-        //pdTRUE, // 函数返回时清除这些位
-        pdFALSE, // 函数返回时是否清除这些位
-        pdTRUE, // 是否等待所有位
-        portMAX_DELAY     // 是否无限期等
+  uxBits = xEventGroupWaitBits(
+        xEventGroup,    // 事件组句�?
+        xBitsToWaitFor, // 要等待的�?
+        // BIT_0 | BIT_1,           // 要等待的�?
+        // pdTRUE, // 函数返回时清除这些位
+        pdFALSE,      // 函数返回时是否清除这些位
+        pdTRUE,       // 是否等待�?有位
+        portMAX_DELAY // 是否无限期等
     );
+    // if ((uxBits & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
     if ((uxBits & BIT_0) == BIT_0)
-    {
-      // BIT_0 和 BIT_1 都被设置
+    { // �?启加�?
       vTaskDelay(100);
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+      TMP114_Read(0x00, EyeTmpRaw);
+      EyeTmp = TmpRaw2Ture(EyeTmpRaw);
+      printf("温度：%f\n", EyeTmp);
+      HeatPWMVal = PID_realize(&HeatPID, EyeTmp);
+      snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+      printf("PWM:%s\n", HeatPWMVal_str);
+      __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal);
+      ScreenUpdateTemperature( EyeTmp,0x0302);                                                   
     }
   }
   /* USER CODE END StartTask02 */
@@ -209,13 +227,12 @@ void App_Uart_ProcessTask(void *argument)
 
   for (;;)
   {
-     vTaskDelay(500);
+    vTaskDelay(50);
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
     if (xQueueReceive(dataQueueHandle, buffer, 100)) // 阻塞接受队列消息
     {
       processData((PCTRL_MSG)buffer); // 处理接收到的数据
     }
-    // if ((uxBits & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
   }
   /* USER CODE END App_Uart_ProcessTask */
 }

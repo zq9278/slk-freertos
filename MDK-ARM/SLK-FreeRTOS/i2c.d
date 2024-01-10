@@ -61,3 +61,5 @@ slk-freertos\i2c.o: ../Core/Inc/usart.h
 slk-freertos\i2c.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 slk-freertos\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 slk-freertos\i2c.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+slk-freertos\i2c.o: ../Hardware/Inc/pid.h
+slk-freertos\i2c.o: ../Hardware/Inc/tmp114.h

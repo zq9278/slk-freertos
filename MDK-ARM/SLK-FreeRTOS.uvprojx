@@ -663,6 +663,16 @@
               <FileType>1</FileType>
               <FilePath>..\Hardware\Src\tmc5130.c</FilePath>
             </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>tmp114.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\tmp114.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

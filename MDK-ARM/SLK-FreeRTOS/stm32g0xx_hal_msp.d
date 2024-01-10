@@ -60,3 +60,5 @@ slk-freertos\stm32g0xx_hal_msp.o: ../Core/Inc/usart.h
 slk-freertos\stm32g0xx_hal_msp.o: D:\SoftWare\Keil\ARM\ARMCC\Bin\..\include\stdio.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/pid.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/tmp114.h

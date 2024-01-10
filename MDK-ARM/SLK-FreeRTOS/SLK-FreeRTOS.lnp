@@ -50,6 +50,8 @@
 "slk-freertos\port.o"
 "slk-freertos\screen.o"
 "slk-freertos\tmc5130.o"
+"slk-freertos\pid.o"
+"slk-freertos\tmp114.o"
 --library_type=microlib --strict --scatter "SLK-FreeRTOS\SLK-FreeRTOS.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
