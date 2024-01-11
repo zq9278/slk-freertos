@@ -41,10 +41,13 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-uint8_t rx_buffer[100];
 extern QueueHandle_t dataQueueHandle;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 const char *str = "interrupt";
+
+#define RX_BUFFER_SIZE 100
+uint8_t rx_buffer[RX_BUFFER_SIZE];
+uint16_t rx_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -245,16 +248,31 @@ void I2C2_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+  //使用DMA的方式在缓冲区和寄存器之间传递值
+  // if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+  // {
+  //   __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
+  //   HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
+  //   size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�?
+  //   xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�?
+  //   // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
+  //   HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�?启DMA
+  // }
 
-  if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+
+  //使用中断的方式在缓冲区和寄存器之间传递值
+    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   {
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
-    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�?
-    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�?
-    // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�?启DMA
+   
+   
+    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�?
+    
+    HAL_UART_Receive_IT(&huart1, rx_buffer, sizeof(rx_buffer));
   }
+
+
+
 
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
