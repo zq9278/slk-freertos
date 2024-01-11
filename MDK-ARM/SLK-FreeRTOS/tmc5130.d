@@ -63,3 +63,4 @@ slk-freertos\tmc5130.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event
 slk-freertos\tmc5130.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 slk-freertos\tmc5130.o: ../Hardware/Inc/pid.h
 slk-freertos\tmc5130.o: ../Hardware/Inc/tmp114.h
+slk-freertos\tmc5130.o: ../Hardware/Inc/ucs1903.h

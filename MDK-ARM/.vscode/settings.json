@@ -20,6 +20,7 @@
         "utility": "c",
         "dma.h": "c",
         "stm32g0xx_hal.h": "c",
-        "limits": "c"
+        "limits": "c",
+        "ucs1903.h": "c"
     }
 }

@@ -49,6 +49,7 @@ uint8_t buffer[100];
 EventGroupHandle_t xEventGroup;
 extern TIM_HandleTypeDef htim14;
 extern uint8_t HeatPWMVal;
+extern TIM_HandleTypeDef htim16;
 
 extern uint8_t EyeTmpRaw[2];
 extern float EyeTmp;
@@ -61,25 +62,29 @@ char HeatPWMVal_str[3];
 /* Definitions for Moto_Task */
 osThreadId_t Moto_TaskHandle;
 const osThreadAttr_t Moto_Task_attributes = {
-    .name = "Moto_Task",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "Moto_Task",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for myTask02 */
 osThreadId_t myTask02Handle;
 const osThreadAttr_t myTask02_attributes = {
-    .name = "myTask02",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "myTask02",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for Uart_ProcessTas */
 osThreadId_t Uart_ProcessTasHandle;
 const osThreadAttr_t Uart_ProcessTas_attributes = {
-    .name = "Uart_ProcessTas",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 130 * 4};
+  .name = "Uart_ProcessTas",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 130 * 4
+};
 /* Definitions for dataQueue */
 osMessageQueueId_t dataQueueHandle;
 const osMessageQueueAttr_t dataQueue_attributes = {
-    .name = "dataQueue"};
+  .name = "dataQueue"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -93,12 +98,11 @@ void App_Uart_ProcessTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
-void MX_FREERTOS_Init(void)
-{
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -117,7 +121,7 @@ void MX_FREERTOS_Init(void)
 
   /* Create the queue(s) */
   /* creation of dataQueue */
-  dataQueueHandle = osMessageQueueNew(3, sizeof(buffer), &dataQueue_attributes);
+  dataQueueHandle = osMessageQueueNew (3, sizeof(buffer), &dataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -139,9 +143,10 @@ void MX_FREERTOS_Init(void)
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
-  xEventGroup = xEventGroupCreate(); // 创建事件�?
+  xEventGroup = xEventGroupCreate(); // 创建事件�???
 
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_AppMoto_Task */
@@ -187,22 +192,22 @@ void StartTask02(void *argument)
   for (;;)
   {
   uxBits = xEventGroupWaitBits(
-        xEventGroup,    // 事件组句�?
-        xBitsToWaitFor, // 要等待的�?
-        // BIT_0 | BIT_1,           // 要等待的�?
+        xEventGroup,    // 事件组句�???
+        xBitsToWaitFor, // 要等待的�???
+        // BIT_0 | BIT_1,           // 要等待的�???
         // pdTRUE, // 函数返回时清除这些位
         pdFALSE,      // 函数返回时是否清除这些位
-        pdTRUE,       // 是否等待�?有位
+        pdTRUE,       // 是否等待�???有位
         portMAX_DELAY // 是否无限期等
     );
     // if ((uxBits & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
     if ((uxBits & BIT_0) == BIT_0)
-    { // �?启加�?
+    { // �???启加�???
       vTaskDelay(100);
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
       TMP114_Read(0x00, EyeTmpRaw);
       EyeTmp = TmpRaw2Ture(EyeTmpRaw);
-      printf("温度：%f\n", EyeTmp);
+      printf("温度�??%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp);
       snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
       printf("PWM:%s\n", HeatPWMVal_str);
@@ -224,10 +229,14 @@ void App_Uart_ProcessTask(void *argument)
 {
   /* USER CODE BEGIN App_Uart_ProcessTask */
   /* Infinite loop */
+    HAL_TIM_Base_Start(&htim16);
+    HAL_TIM_PWM_Start(&htim16, LED_TIM_CHANNEL);
+    uint8_t colors[1][3];
 
   for (;;)
   {
     vTaskDelay(50);
+        sendColor(0,0,255,20);
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
     if (xQueueReceive(dataQueueHandle, buffer, 100)) // 阻塞接受队列消息
     {
@@ -241,3 +250,4 @@ void App_Uart_ProcessTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+

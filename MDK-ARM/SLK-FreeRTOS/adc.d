@@ -63,3 +63,4 @@ slk-freertos\adc.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_gro
 slk-freertos\adc.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 slk-freertos\adc.o: ../Hardware/Inc/pid.h
 slk-freertos\adc.o: ../Hardware/Inc/tmp114.h
+slk-freertos\adc.o: ../Hardware/Inc/ucs1903.h

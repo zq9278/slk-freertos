@@ -63,3 +63,4 @@ slk-freertos\screen.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_
 slk-freertos\screen.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 slk-freertos\screen.o: ../Hardware/Inc/pid.h
 slk-freertos\screen.o: ../Hardware/Inc/tmp114.h
+slk-freertos\screen.o: ../Hardware/Inc/ucs1903.h

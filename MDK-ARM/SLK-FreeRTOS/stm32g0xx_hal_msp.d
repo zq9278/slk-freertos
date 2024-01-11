@@ -62,3 +62,4 @@ slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/inc
 slk-freertos\stm32g0xx_hal_msp.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/pid.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/tmp114.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/ucs1903.h

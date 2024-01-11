@@ -137,6 +137,7 @@ void Error_Handler(void);
 #include "stm32g0xx_hal.h"
 #include "pid.h"
 #include "tmp114.h"
+#include "ucs1903.h"
 
 #define BIT_0 (1 << 0)
 #define BIT_1 (1 << 1)
