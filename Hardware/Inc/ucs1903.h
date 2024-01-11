@@ -5,8 +5,8 @@
 
 
 
-void sendBit(uint8_t bit);
+// void sendBit(uint8_t bit);
 
-void sendByte(uint8_t b);
+ void UCS1903Show(void);
 
-void sendColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t length);
+void sendColor(uint8_t red, uint8_t green, uint8_t blue);

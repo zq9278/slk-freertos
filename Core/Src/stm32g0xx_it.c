@@ -45,9 +45,8 @@ extern QueueHandle_t dataQueueHandle;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 const char *str = "interrupt";
 
-#define RX_BUFFER_SIZE 100
+#define RX_BUFFER_SIZE 200
 uint8_t rx_buffer[RX_BUFFER_SIZE];
-uint16_t rx_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,8 +68,8 @@ extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
 extern I2C_HandleTypeDef hi2c1;
 extern I2C_HandleTypeDef hi2c2;
+extern DMA_HandleTypeDef hdma_tim16_ch1;
 extern DMA_HandleTypeDef hdma_usart1_tx;
-extern DMA_HandleTypeDef hdma_usart1_rx;
 extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim6;
 
@@ -172,7 +171,7 @@ void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
   HAL_DMA_IRQHandler(&hdma_i2c2_tx);
   HAL_DMA_IRQHandler(&hdma_adc1);
   HAL_DMA_IRQHandler(&hdma_usart1_tx);
-  HAL_DMA_IRQHandler(&hdma_usart1_rx);
+  HAL_DMA_IRQHandler(&hdma_tim16_ch1);
   /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 1 */
 
   /* USER CODE END DMA1_Ch4_7_DMAMUX1_OVR_IRQn 1 */
@@ -248,27 +247,27 @@ void I2C2_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-  //使用DMA的方式在缓冲区和寄存器之间传递值
+  //使用DMA的方式在缓冲区和寄存器之间传递�??
   // if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   // {
   //   __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
   //   HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //   size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�?
-  //   xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�?
+  //   size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
+  //   xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
   //   // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //   HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�?启DMA
+  //   HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
   // }
 
 
-  //使用中断的方式在缓冲区和寄存器之间传递值
+  //使用中断的方式在缓冲区和寄存器之间传递�??
     if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   {
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
    
-   
-    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�?
-    
-    HAL_UART_Receive_IT(&huart1, rx_buffer, sizeof(rx_buffer));
+   printf("%s",rx_buffer);
+    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
+    memset(rx_buffer, 0, 200); 
+    HAL_UART_Receive_IT(&huart1, rx_buffer, (uint16_t)200);
   }
 
 

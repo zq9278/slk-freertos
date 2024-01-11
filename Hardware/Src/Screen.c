@@ -4,7 +4,7 @@
 #define CMD_MAX_SIZE 64     // 帧尾
 uint8_t cmd_buffer[CMD_MAX_SIZE]; // 指令缓存
 
-extern  EventGroupHandle_t xEventGroup;
+extern  EventGroupHandle_t All_EventHandle;
 extern  TIM_HandleTypeDef htim14;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 const EventBits_t xBitsToSet = BIT_0;
@@ -48,13 +48,13 @@ void processData(PCTRL_MSG msg)
         /*热敷开始*/
 
     case 0x1041:
-         xEventGroupSetBits( xEventGroup, xBitsToSet );//设定任务开启标志位
+         xEventGroupSetBits( All_EventHandle, BIT_0 );//设定任务开启标志位
          HAL_TIM_PWM_Start(&htim14,TIM_CHANNEL_1);
         break;
 
         /*热敷结束*/
         case 0x1030:
-        	xEventGroupClearBits( xEventGroup, xBitsToSet );//清除任务开启标志位
+        	xEventGroupClearBits( All_EventHandle, BIT_0 );//清除任务开启标志位
             //发送停止位
         	break;
 
