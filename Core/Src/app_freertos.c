@@ -45,13 +45,14 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-uint8_t buffer[200];
+uart_data uart_rx_data;
 extern TIM_HandleTypeDef htim14;
 extern uint8_t HeatPWMVal;
 extern TIM_HandleTypeDef htim16;
 
 extern uint8_t EyeTmpRaw[2];
 extern float EyeTmp;
+
 
 extern PID_typedef HeatPID;
 
@@ -121,7 +122,7 @@ void MX_FREERTOS_Init(void)
 
   /* Create the queue(s) */
   /* creation of dataQueue */
-  dataQueueHandle = osMessageQueueNew(3, sizeof(buffer), &dataQueue_attributes);
+  dataQueueHandle = osMessageQueueNew(10, sizeof(uart_data), &dataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -188,8 +189,6 @@ void APP_HeatTask(void *argument)
   /* Infinite loop */
   EventBits_t Heat_Event_Bit;
 
-  HeatPIDInit();
-  TMP114_Init();
   for (;;)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
@@ -207,12 +206,12 @@ void APP_HeatTask(void *argument)
 
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-      //printf("Temperature:%f\n", EyeTmp);
+      // printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
-      snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-      //printf("PWM:%s\n", HeatPWMVal_str);
+      // snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+      // printf("PWM:%s\n", HeatPWMVal_str);
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-      //ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+      // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
     }
   }
 
@@ -239,10 +238,10 @@ void App_Uart_ProcessTask(void *argument)
   {
     // vTaskDelay(50);
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-    if (xQueueReceive(dataQueueHandle, buffer, 100)) // 阻塞接受队列消息
+    if (xQueueReceive(dataQueueHandle,&uart_rx_data, 10)) // 阻塞接受队列消息
     {
-      processData((PCTRL_MSG)buffer); // 处理接收到的数据
-      
+      HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF); 
+      processData((PCTRL_MSG)uart_rx_data.buffer); // 处理接收到的数据
     }
   }
   /* USER CODE END App_Uart_ProcessTask */

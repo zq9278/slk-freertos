@@ -21,6 +21,7 @@
         "dma.h": "c",
         "stm32g0xx_hal.h": "c",
         "limits": "c",
-        "ucs1903.h": "c"
+        "ucs1903.h": "c",
+        "tmp114.h": "c"
     }
 }

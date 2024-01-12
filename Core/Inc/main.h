@@ -145,6 +145,26 @@ void Error_Handler(void);
 #define TMP114Address		0x90
 //#include "retarget.h"
 
+
+
+
+
+
+
+
+#ifndef __uart_data_type
+#define __uart_data_type
+typedef struct {
+    uint8_t buffer[50];   // 指向数据的指针
+    uint16_t length;  // 数据长度
+} uart_data; 
+#endif
+
+
+
+
+
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
@@ -152,3 +172,5 @@ void Error_Handler(void);
 #endif
 
 #endif /* __MAIN_H */
+
+

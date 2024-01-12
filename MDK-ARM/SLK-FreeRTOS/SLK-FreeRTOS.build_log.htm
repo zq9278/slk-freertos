@@ -22,21 +22,87 @@ Dialog DLL:      TARMCM1.DLL V1.14.4.0
  
 <h2>Project:</h2>
 d:\STM32_CODE\slk-freertos\MDK-ARM\SLK-FreeRTOS.uvprojx
-Project File Date:  01/11/2024
+Project File Date:  01/12/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\SoftWare\Keil\ARM\ARMCC\Bin'
 Build target 'SLK-FreeRTOS'
+compiling spi.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/spi.c: 1 warning, 0 errors
 compiling stm32g0xx_it.c...
 ../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
   #endif // 结束 #ifndef �?
-../Core/Src/stm32g0xx_it.c(269): warning:  #223-D: function "memset" declared implicitly
-      memset(rx_buffer, 0, 200); 
-../Core/Src/stm32g0xx_it.c: 2 warnings, 0 errors
+../Core/Src/stm32g0xx_it.c: 1 warning, 0 errors
+compiling dma.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/dma.c: 1 warning, 0 errors
+compiling main.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/main.c: 1 warning, 0 errors
+compiling stm32g0xx_hal_msp.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/stm32g0xx_hal_msp.c: 1 warning, 0 errors
+compiling gpio.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/gpio.c: 1 warning, 0 errors
+compiling usart.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/usart.c: 1 warning, 0 errors
+compiling i2c.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/i2c.c: 1 warning, 0 errors
+compiling app_freertos.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/app_freertos.c: 1 warning, 0 errors
+compiling tim.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Core\Src\tim.c: 1 warning, 0 errors
+compiling adc.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/adc.c: 1 warning, 0 errors
+compiling ucs1903.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Hardware\Src\ucs1903.c(43): warning:  #1-D: last line of file ends without a newline
+  // }
+..\Hardware\Src\ucs1903.c: 2 warnings, 0 errors
+compiling Screen.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Hardware\Src\Screen.c(25): warning:  #177-D: variable "control_type"  was declared but never referenced
+      uint8_t control_type = msg->control_type; // 指令类型
+..\Hardware\Src\Screen.c(130): warning:  #175-D: subscript out of range
+  	SendBuff[12]=0xFF;
+..\Hardware\Src\Screen.c: 4 warnings, 0 errors
+compiling pid.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Hardware\Src\pid.c: 1 warning, 0 errors
+compiling tmp114.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Hardware\Src\tmp114.c: 1 warning, 0 errors
+compiling tmc5130.c...
+../Hardware/Inc/Screen.h(52): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+..\Hardware\Src\tmc5130.c: 1 warning, 0 errors
 linking...
-Program Size: Code=29220 RO-data=564 RW-data=176 ZI-data=9784  
+Program Size: Code=26184 RO-data=564 RW-data=172 ZI-data=9308  
 FromELF: creating hex file...
-"SLK-FreeRTOS\SLK-FreeRTOS.axf" - 0 Error(s), 2 Warning(s).
+"SLK-FreeRTOS\SLK-FreeRTOS.axf" - 0 Error(s), 20 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,7 +126,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

@@ -48,13 +48,15 @@ void processData(PCTRL_MSG msg)
         /*热敷开始*/
 
     case 0x1041:
-         xEventGroupSetBits( All_EventHandle, BIT_0 );//设定任务开启标志位
+    HeatPIDInit();
+  TMP114_Init();                                                                                                                
+         xEventGroupSetBits( All_EventHandle, xBitsToSet );//设定任务开启标志位
          HAL_TIM_PWM_Start(&htim14,TIM_CHANNEL_1);
         break;
 
         /*热敷结束*/
         case 0x1030:
-        	xEventGroupClearBits( All_EventHandle, BIT_0 );//清除任务开启标志位
+        	xEventGroupClearBits( All_EventHandle, xBitsToSet );//清除任务开启标志位
             //发送停止位
         	break;
 

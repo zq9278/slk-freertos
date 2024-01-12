@@ -45,8 +45,10 @@ extern QueueHandle_t dataQueueHandle;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 const char *str = "interrupt";
 
-#define RX_BUFFER_SIZE 200
+#define RX_BUFFER_SIZE 100
 uint8_t rx_buffer[RX_BUFFER_SIZE];
+uart_data uart_RX_data;
+uint8_t rx_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,8 +64,6 @@ uint8_t rx_buffer[RX_BUFFER_SIZE];
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc1;
 extern ADC_HandleTypeDef hadc1;
-extern DMA_HandleTypeDef hdma_i2c1_rx;
-extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
 extern I2C_HandleTypeDef hi2c1;
@@ -81,8 +81,8 @@ extern TIM_HandleTypeDef htim6;
 /*           Cortex-M0+ Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
+ * @brief This function handles Non maskable interrupt.
+ */
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -96,8 +96,8 @@ void NMI_Handler(void)
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
+ * @brief This function handles Hard fault interrupt.
+ */
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -118,8 +118,8 @@ void HardFault_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles EXTI line 2 and line 3 interrupts.
-  */
+ * @brief This function handles EXTI line 2 and line 3 interrupts.
+ */
 void EXTI2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
@@ -132,28 +132,13 @@ void EXTI2_3_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel 1 interrupt.
-  */
-void DMA1_Channel1_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
-  */
+ * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
+ */
 void DMA1_Channel2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
 
   /* USER CODE END DMA1_Channel2_3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
   HAL_DMA_IRQHandler(&hdma_i2c2_rx);
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
 
@@ -161,8 +146,8 @@ void DMA1_Channel2_3_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
-  */
+ * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
+ */
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 0 */
@@ -178,8 +163,8 @@ void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles ADC1 interrupt.
-  */
+ * @brief This function handles ADC1 interrupt.
+ */
 void ADC1_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC1_IRQn 0 */
@@ -192,8 +177,8 @@ void ADC1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM6 global interrupt.
-  */
+ * @brief This function handles TIM6 global interrupt.
+ */
 void TIM6_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_IRQn 0 */
@@ -206,16 +191,19 @@ void TIM6_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
-  */
+ * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
+ */
 void I2C1_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C1_IRQn 0 */
 
   /* USER CODE END I2C1_IRQn 0 */
-  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
+  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
+  {
     HAL_I2C_ER_IRQHandler(&hi2c1);
-  } else {
+  }
+  else
+  {
     HAL_I2C_EV_IRQHandler(&hi2c1);
   }
   /* USER CODE BEGIN I2C1_IRQn 1 */
@@ -224,16 +212,19 @@ void I2C1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I2C2 global interrupt.
-  */
+ * @brief This function handles I2C2 global interrupt.
+ */
 void I2C2_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C2_IRQn 0 */
 
   /* USER CODE END I2C2_IRQn 0 */
-  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
+  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
+  {
     HAL_I2C_ER_IRQHandler(&hi2c2);
-  } else {
+  }
+  else
+  {
     HAL_I2C_EV_IRQHandler(&hi2c2);
   }
   /* USER CODE BEGIN I2C2_IRQn 1 */
@@ -242,41 +233,40 @@ void I2C2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
-  */
+ * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
+ */
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-  //使用DMA的方式在缓冲区和寄存器之间传递�??
-  // if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
-  // {
-  //   __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
-  //   HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //   size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
-  //   xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
-  //   // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //   HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
-  // }
+  // 使用DMA的方式在缓冲区和寄存器之间传递�??
+  //  if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+  //  {
+  //    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
+  //    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
+  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
+  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
+  //     HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
+  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
+  //  }
 
-
-  //使用中断的方式在缓冲区和寄存器之间传递�??
-    if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+  if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
   {
-    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
-   
-   printf("%s",rx_buffer);
-    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
-    memset(rx_buffer, 0, 200); 
-    HAL_UART_Receive_IT(&huart1, rx_buffer, (uint16_t)200);
+    uint8_t received_data = (uint8_t)(huart1.Instance->RDR & 0xFF); // ?????UART??
+    uart_RX_data.buffer[rx_index++] = received_data;
   }
-
-
-
+  if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+  {
+    __HAL_UART_CLEAR_IDLEFLAG(&huart1);
+    //HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
+    uart_RX_data.length=rx_index;
+    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL);                        // 在中断中向队列添加数�??
+    rx_index = 0;                                                                //
+  }
 
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-
+  //__HAL_UART_CLEAR_IT(&huart1, UART_IT_RXNE); // ??????
   /* USER CODE END USART1_IRQn 1 */
 }
 
