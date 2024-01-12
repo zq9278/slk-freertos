@@ -215,6 +215,33 @@ void APP_HeatTask(void *argument)
     }
   }
 
+
+  /*
+  for (;;)
+{
+    Heat_Event_Bit = xEventGroupWaitBits(
+        All_EventHandle, // Event group handle
+        BIT_0 | BIT_1,   // flag bits to wait for
+        pdFALSE,         // clear these bits when the function responds
+        pdFALSE,         // Wait for any flag bit
+        portMAX_DELAY    // Whether to wait indefinitely
+    );
+
+    // 只有当BIT_0被设置时执行代码块1
+    if ((Heat_Event_Bit & BIT_0) == BIT_0 && (Heat_Event_Bit & BIT_1) == 0)
+    {
+        // 执行代码块1
+    }
+
+    // 当BIT_0和BIT_1同时设置时只执行代码块2
+    else if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1))
+    {
+        // 执行代码块2
+    }
+}
+  
+  */
+
   /* USER CODE END APP_HeatTask */
 }
 
