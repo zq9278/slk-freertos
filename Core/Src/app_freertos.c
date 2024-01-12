@@ -206,12 +206,12 @@ void APP_HeatTask(void *argument)
 
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-      // printf("Temperature:%f\n", EyeTmp);
+       printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
-      // snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-      // printf("PWM:%s\n", HeatPWMVal_str);
+       snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+       printf("PWM:%s\n", HeatPWMVal_str);
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-      // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+       //ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
     }
   }
 
@@ -240,7 +240,7 @@ void App_Uart_ProcessTask(void *argument)
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
     if (xQueueReceive(dataQueueHandle,&uart_rx_data, 10)) // 阻塞接受队列消息
     {
-      HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF); 
+      //HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF); 
       processData((PCTRL_MSG)uart_rx_data.buffer); // 处理接收到的数据
     }
   }
