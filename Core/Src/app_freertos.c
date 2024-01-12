@@ -53,7 +53,6 @@ extern TIM_HandleTypeDef htim16;
 extern uint8_t EyeTmpRaw[2];
 extern float EyeTmp;
 
-
 extern PID_typedef HeatPID;
 
 const char *str1 = "queue";
@@ -193,28 +192,30 @@ void APP_HeatTask(void *argument)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
         All_EventHandle, // Event group handle
-        BIT_0,           // flag bits to wait for
+        Heat_BIT_0|SW_BIT_1,      // flag bits to wait for
         pdFALSE,         // clear these bits when the function responds
-        pdTRUE,          // Whether to wait for all flag bits
-        portMAX_DELAY    // Whether to wait indefinitely
+        pdFALSE,          // Whether to wait for all flag bits
+        100    // Whether to wait indefinitely
+        //portMAX_DELAY    // Whether to wait indefinitely
     );
     // if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
-    if ((Heat_Event_Bit & BIT_0) == BIT_0)
-    {
-      vTaskDelay(100);
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
-
+    if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))
+    {vTaskDelay(100);
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-       printf("Temperature:%f\n", EyeTmp);
+      printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
-       snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-       printf("PWM:%s\n", HeatPWMVal_str);
+      snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+      printf("PWM:%s\n", HeatPWMVal_str);
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-       //ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+                                                                 // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+    }
+     if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))
+    {
+vTaskDelay(100);
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
     }
   }
-
 
   /*
   for (;;)
@@ -239,7 +240,7 @@ void APP_HeatTask(void *argument)
         // 执行代码块2
     }
 }
-  
+
   */
 
   /* USER CODE END APP_HeatTask */
@@ -265,9 +266,9 @@ void App_Uart_ProcessTask(void *argument)
   {
     // vTaskDelay(50);
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-    if (xQueueReceive(dataQueueHandle,&uart_rx_data, 10)) // 阻塞接受队列消息
+    if (xQueueReceive(dataQueueHandle, &uart_rx_data, 10)) // 阻塞接受队列消息
     {
-      //HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF); 
+      // HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF);
       processData((PCTRL_MSG)uart_rx_data.buffer); // 处理接收到的数据
     }
   }

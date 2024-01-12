@@ -43,12 +43,14 @@
 /* USER CODE BEGIN PV */
 extern QueueHandle_t dataQueueHandle;
 extern DMA_HandleTypeDef hdma_usart1_rx;
+extern EventGroupHandle_t All_EventHandle;
 const char *str = "interrupt";
 
 #define RX_BUFFER_SIZE 100
 uint8_t rx_buffer[RX_BUFFER_SIZE];
 uart_data uart_RX_data;
 uint8_t rx_index = 0;
+// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如第0位
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -238,15 +240,15 @@ void I2C2_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-  // 使用DMA的方式在缓冲区和寄存器之间传递�??
+  // 使用DMA的方式在缓冲区和寄存器之间传递�??
   //  if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   //  {
   //    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
   //    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
-  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
+  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
+  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
   //     HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
+  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
   //  }
 
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
@@ -257,19 +259,42 @@ void USART1_IRQHandler(void)
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   {
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
-    //HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
-    uart_RX_data.length=rx_index;
-    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL);                        // 在中断中向队列添加数�??
-    rx_index = 0;                                                                //
+    // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
+    uart_RX_data.length = rx_index;
+    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�??
+    rx_index = 0;                                            //
   }
 
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-  //__HAL_UART_CLEAR_IT(&huart1, UART_IT_RXNE); // ??????
   /* USER CODE END USART1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
-
+void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
+  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)) // 电机或者加热膜有一个事件发生了，都可以进入开关检测状态
+  {
+    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理开关是否被按下
+    {
+      // 设置事件组的标志位
+      if ((xBits & SW_BIT_1) == 0) // 开关事件是否发生
+      {
+        // 如果SW_BIT_1当前是清除的，那么设置它
+        // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
+        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置开关事件发生
+      }
+      else
+      {
+        // 如果SW_BIT_1当前是设置的，那么清除它
+        xEventGroupClearBitsFromISR(All_EventHandle, SW_BIT_1);    // 清除按钮事件
+        xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
+        xEventGroupClearBitsFromISR(All_EventHandle, Motor_BIT_2); // 清除电机事件
+      }
+    }
+  }
+}
 /* USER CODE END 1 */

@@ -139,8 +139,11 @@ void Error_Handler(void);
 #include "tmp114.h"
 #include "ucs1903.h"
 
-#define BIT_0 (1 << 0)
-#define BIT_1 (1 << 1)
+#define Heat_BIT_0 (1 << 0)
+#define SW_BIT_1 (1 << 1)
+#define Motor_BIT_2 (1 <<2)
+#define Preheating_BIT_3 (1 <<3)
+#define PreMotor_BIT_4 (1 <<4)
 
 #define TMP114Address		0x90
 //#include "retarget.h"

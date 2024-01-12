@@ -7,8 +7,8 @@ uint8_t cmd_buffer[CMD_MAX_SIZE]; // 指令缓存
 extern EventGroupHandle_t All_EventHandle;
 extern TIM_HandleTypeDef htim14;
 extern DMA_HandleTypeDef hdma_usart1_tx;
-const EventBits_t xBitsToSet = BIT_0;
-const EventBits_t xBitsToSet1 = BIT_1;
+const EventBits_t xBitsToSet = Heat_BIT_0;
+const EventBits_t xBitsToSet1 = Motor_BIT_2;
 uint8_t SendBuff[12];
 
 void processData(PCTRL_MSG msg)
