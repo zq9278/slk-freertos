@@ -290,9 +290,10 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
       else
       {
         // 如果SW_BIT_1当前是设置的，那么清除它
+				xEventGroupClearBitsFromISR(All_EventHandle, Motor_BIT_2); // 清除电机事件
         xEventGroupClearBitsFromISR(All_EventHandle, SW_BIT_1);    // 清除按钮事件
         xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
-        xEventGroupClearBitsFromISR(All_EventHandle, Motor_BIT_2); // 清除电机事件
+        
       }
     }
   }

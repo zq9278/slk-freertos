@@ -60,12 +60,13 @@ void processData(PCTRL_MSG msg)
         // 发送停止位
         break;
 
-        // /*脉动开始*/
-        // case 0x1005:
-        // 	ForceSet=ScreenCmdData/50;//设定压力
-        // 	ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
-        // 	WorkMode = 0x02;
-        // 	break;
+        /*脉动开始*/
+        case 0x1005:
+        	// ForceSet=ScreenCmdData/50;//设定压力
+        	// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
+        	// WorkMode = 0x02;
+            xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定任务开启标志位
+        	break;
 
         // /*脉动结束*/
         // case 0x1034:

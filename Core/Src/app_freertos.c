@@ -161,11 +161,41 @@ void MX_FREERTOS_Init(void)
 void AppMotor_Task(void *argument)
 {
   /* USER CODE BEGIN AppMotor_Task */
+  EventBits_t Motor_Event_Bit;
+
   TMC5130_Init();
   HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
   TMC5130_Write(0xa7, 0x20000);
   for (;;)
   {
+    Motor_Event_Bit = xEventGroupWaitBits(
+        All_EventHandle,        // Event group handle
+        Motor_BIT_2 | SW_BIT_1, // flag bits to wait for
+        pdFALSE,                // clear these bits when the function responds
+        pdFALSE,                // Whether to wait for all flag bits
+        100                     // Whether to wait indefinitely
+                                // portMAX_DELAY    // Whether to wait indefinitely
+    );
+    if (((Motor_Event_Bit & Motor_BIT_2) != 0) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
+    {
+      vTaskDelay(200);
+       printf("预电机模式\n");
+    }
+    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式）
+    {
+      vTaskDelay(200);
+			 EventBits_t uxBits = xEventGroupGetBits(All_EventHandle);
+			  for (int i = 31; i >= 0; i--) {
+        // 检查第i位是否为1
+        if (uxBits & (1 << i)) {
+            printf("1");
+        } else {
+            printf("0");
+        }
+    }
+      printf("正式脉动模式");
+    }
+
     TMC5130_Write(0xa0, 1); // 设置tmc电机方向向前
     vTaskDelay(1000);
     TMC5130_Write(0xa0, 2);
@@ -191,31 +221,35 @@ void APP_HeatTask(void *argument)
   for (;;)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
-        All_EventHandle, // Event group handle
-        Heat_BIT_0|SW_BIT_1,      // flag bits to wait for
-        pdFALSE,         // clear these bits when the function responds
-        pdFALSE,          // Whether to wait for all flag bits
-        100    // Whether to wait indefinitely
-        //portMAX_DELAY    // Whether to wait indefinitely
+        All_EventHandle,       // Event group handle
+        Heat_BIT_0 | SW_BIT_1, // flag bits to wait for
+        pdFALSE,               // clear these bits when the function responds
+        pdFALSE,               // Whether to wait for all flag bits
+        100                    // Whether to wait indefinitely
+                               // portMAX_DELAY    // Whether to wait indefinitely
     );
     // if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
-    //if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
-    if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
-    {vTaskDelay(100);
+    // if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
+    if (((Heat_Event_Bit & Heat_BIT_0) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
+    {
+
+      vTaskDelay(100);
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+       printf("预加热模式\n");
+    }
+    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式）
+    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式）
+    {
+      printf("正式加热模式");
+      vTaskDelay(100);
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-      printf("Temperature:%f\n", EyeTmp);
+      // printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
       snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-      printf("PWM:%s\n", HeatPWMVal_str);
+      // printf("PWM:%s\n", HeatPWMVal_str);
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-                                                                 // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
-    }
-     //else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式）
-     else if ((Heat_Event_Bit & (Heat_BIT_0|SW_BIT_1)) ==(Heat_BIT_0|SW_BIT_1))//加热事件发生，按钮事件发生（正式加热模式）
-    {
-vTaskDelay(100);
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+      // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
     }
   }
 
