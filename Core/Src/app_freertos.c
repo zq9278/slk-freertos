@@ -199,7 +199,8 @@ void APP_HeatTask(void *argument)
         //portMAX_DELAY    // Whether to wait indefinitely
     );
     // if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
-    if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))
+    //if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
+    if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
     {vTaskDelay(100);
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
@@ -210,7 +211,8 @@ void APP_HeatTask(void *argument)
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
                                                                  // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
     }
-     if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))
+     //else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式）
+     else if ((Heat_Event_Bit & (Heat_BIT_0|SW_BIT_1)) ==(Heat_BIT_0|SW_BIT_1))//加热事件发生，按钮事件发生（正式加热模式）
     {
 vTaskDelay(100);
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
