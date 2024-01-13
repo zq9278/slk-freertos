@@ -50,7 +50,7 @@ const char *str = "interrupt";
 uint8_t rx_buffer[RX_BUFFER_SIZE];
 uart_data uart_RX_data;
 uint8_t rx_index = 0;
-// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如第0位
+// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如�??0�??
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,8 +83,8 @@ extern TIM_HandleTypeDef htim6;
 /*           Cortex-M0+ Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
- * @brief This function handles Non maskable interrupt.
- */
+  * @brief This function handles Non maskable interrupt.
+  */
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -98,8 +98,8 @@ void NMI_Handler(void)
 }
 
 /**
- * @brief This function handles Hard fault interrupt.
- */
+  * @brief This function handles Hard fault interrupt.
+  */
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -120,8 +120,8 @@ void HardFault_Handler(void)
 /******************************************************************************/
 
 /**
- * @brief This function handles EXTI line 2 and line 3 interrupts.
- */
+  * @brief This function handles EXTI line 2 and line 3 interrupts.
+  */
 void EXTI2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
@@ -134,8 +134,8 @@ void EXTI2_3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
- */
+  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
+  */
 void DMA1_Channel2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
@@ -148,8 +148,8 @@ void DMA1_Channel2_3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
- */
+  * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
+  */
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 0 */
@@ -165,8 +165,8 @@ void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 }
 
 /**
- * @brief This function handles ADC1 interrupt.
- */
+  * @brief This function handles ADC1 interrupt.
+  */
 void ADC1_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC1_IRQn 0 */
@@ -179,8 +179,8 @@ void ADC1_IRQHandler(void)
 }
 
 /**
- * @brief This function handles TIM6 global interrupt.
- */
+  * @brief This function handles TIM6 global interrupt.
+  */
 void TIM6_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_IRQn 0 */
@@ -193,19 +193,16 @@ void TIM6_IRQHandler(void)
 }
 
 /**
- * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
- */
+  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
+  */
 void I2C1_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C1_IRQn 0 */
 
   /* USER CODE END I2C1_IRQn 0 */
-  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
-  {
+  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
     HAL_I2C_ER_IRQHandler(&hi2c1);
-  }
-  else
-  {
+  } else {
     HAL_I2C_EV_IRQHandler(&hi2c1);
   }
   /* USER CODE BEGIN I2C1_IRQn 1 */
@@ -214,19 +211,16 @@ void I2C1_IRQHandler(void)
 }
 
 /**
- * @brief This function handles I2C2 global interrupt.
- */
+  * @brief This function handles I2C2 global interrupt.
+  */
 void I2C2_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C2_IRQn 0 */
 
   /* USER CODE END I2C2_IRQn 0 */
-  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
-  {
+  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
     HAL_I2C_ER_IRQHandler(&hi2c2);
-  }
-  else
-  {
+  } else {
     HAL_I2C_EV_IRQHandler(&hi2c2);
   }
   /* USER CODE BEGIN I2C2_IRQn 1 */
@@ -235,8 +229,8 @@ void I2C2_IRQHandler(void)
 }
 
 /**
- * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
- */
+  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
+  */
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
@@ -245,10 +239,10 @@ void USART1_IRQHandler(void)
   //  {
   //    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
   //    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??
-  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??
+  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�????
+  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�????
   //     HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??启DMA
+  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�????启DMA
   //  }
 
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
@@ -261,7 +255,7 @@ void USART1_IRQHandler(void)
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
     // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
     uart_RX_data.length = rx_index;
-    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�??
+    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�????
     rx_index = 0;                                            //
   }
 
@@ -276,23 +270,27 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
-  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)) // 电机或者加热膜有一个事件发生了，都可以进入开关检测状态
+  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�??关检测状�??
   {
-    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理开关是否被按下
+    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�??关是否被按下
     {
-      // 设置事件组的标志位
-      if ((xBits & SW_BIT_1) == 0) // 开关事件是否发生
+      // 设置事件组的标志�??
+      if ((xBits & SW_BIT_1) == 0) // �??关事件是否发�??
       {
         // 如果SW_BIT_1当前是清除的，那么设置它
         // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
-        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置开关事件发生
+        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�??关事件发�??
       }
       else
       {
         // 如果SW_BIT_1当前是设置的，那么清除它
-				xEventGroupClearBitsFromISR(All_EventHandle, Motor_BIT_2); // 清除电机事件
-        xEventGroupClearBitsFromISR(All_EventHandle, SW_BIT_1);    // 清除按钮事件
-        xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
+				
+       
+        xEventGroupClearBits(All_EventHandle, Motor_BIT_2);  // 清除加热事件
+        xEventGroupClearBits(All_EventHandle, SW_BIT_1);  // 清除加热事件
+        xEventGroupClearBits(All_EventHandle, Heat_BIT_0);  // 清除加热事件
+        //xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
+        
         
       }
     }

@@ -50,13 +50,13 @@ void processData(PCTRL_MSG msg)
     case 0x1041:
         HeatPIDInit();
         TMP114_Init();
-        xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定任务开启标志位
+        xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
         HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);//enable pwm for heating film 
         break;
 
     /*热敷结束*/
     case 0x1030:
-        xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除任务开启标志位
+        xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
         // 发送停止位
         break;
 
@@ -65,34 +65,39 @@ void processData(PCTRL_MSG msg)
         	// ForceSet=ScreenCmdData/50;//设定压力
         	// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
         	// WorkMode = 0x02;
-            xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定任务开启标志位
+            xEventGroupSetBits(All_EventHandle, xBitsToSet1); // 设定脉动任务开启标志位
         	break;
 
-        // /*脉动结束*/
-        // case 0x1034:
-        // 	WorkMode=0;
-        // 	HAL_TIM_Base_Stop_IT(&htim6);
-        // 	Tim6Cnt=0;
-        // 	MotorState=0;
-        // 	MotorChecking();
-        // 	break;
+        /*脉动结束*/
+        case 0x1034:
+        	// WorkMode=0;
+        	// HAL_TIM_Base_Stop_IT(&htim6);
+        	// Tim6Cnt=0;
+        	// MotorState=0;
+        	// MotorChecking();
+            xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
+        	break;
 
         // /*自动模式开始*/
         // case 0x1037:
-        // 	ForceSet=ScreenCmdData/50;//设定压力
-        // 	ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
-        // 	WorkMode = 0x03;
+        // 	// ForceSet=ScreenCmdData/50;//设定压力
+        // 	// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
+        // 	// WorkMode = 0x03;
+        //     xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
+        //      xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定脉动任务开启标志位
         // 	break;
 
         // /*自动模式结束*/
         // case 0x1038:
-        // 	WorkMode=0;
-        // 	HeatPower(OFF);
-        // 	HeatPWMVal=0;
-        // 	HAL_TIM_Base_Stop_IT(&htim6);
-        // 	Tim6Cnt=0;
-        // 	MotorState=0;
-        // 	MotorChecking();
+        // 	// WorkMode=0;
+        // 	// HeatPower(OFF);
+        // 	// HeatPWMVal=0;
+        // 	// HAL_TIM_Base_Stop_IT(&htim6);
+        // 	// Tim6Cnt=0;
+        // 	// MotorState=0;
+        // 	// MotorChecking();
+        //     xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
+        //     xEventGroupClearBits(All_EventHandle, Motor_BIT_2); // 清除脉动任务开启标志位
         // 	break;
 
     default:

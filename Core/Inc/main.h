@@ -158,7 +158,7 @@ void Error_Handler(void);
 #ifndef __uart_data_type
 #define __uart_data_type
 typedef struct {
-    uint8_t buffer[50];   // 指向数据的指针
+    uint8_t buffer[50];   // 指向数据的指�?
     uint16_t length;  // 数据长度
 } uart_data; 
 #endif
@@ -175,5 +175,3 @@ typedef struct {
 #endif
 
 #endif /* __MAIN_H */
-
-

@@ -61,29 +61,34 @@ char HeatPWMVal_str[3];
 /* Definitions for Motor_Task */
 osThreadId_t Motor_TaskHandle;
 const osThreadAttr_t Motor_Task_attributes = {
-    .name = "Motor_Task",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "Motor_Task",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for HeatTask */
 osThreadId_t HeatTaskHandle;
 const osThreadAttr_t HeatTask_attributes = {
-    .name = "HeatTask",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "HeatTask",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for Uart_ProcessTas */
 osThreadId_t Uart_ProcessTasHandle;
 const osThreadAttr_t Uart_ProcessTas_attributes = {
-    .name = "Uart_ProcessTas",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 130 * 4};
+  .name = "Uart_ProcessTas",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 130 * 4
+};
 /* Definitions for dataQueue */
 osMessageQueueId_t dataQueueHandle;
 const osMessageQueueAttr_t dataQueue_attributes = {
-    .name = "dataQueue"};
+  .name = "dataQueue"
+};
 /* Definitions for All_Event */
 osEventFlagsId_t All_EventHandle;
 const osEventFlagsAttr_t All_Event_attributes = {
-    .name = "All_Event"};
+  .name = "All_Event"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -97,12 +102,11 @@ void App_Uart_ProcessTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
-void MX_FREERTOS_Init(void)
-{
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -121,7 +125,7 @@ void MX_FREERTOS_Init(void)
 
   /* Create the queue(s) */
   /* creation of dataQueue */
-  dataQueueHandle = osMessageQueueNew(10, sizeof(uart_data), &dataQueue_attributes);
+  dataQueueHandle = osMessageQueueNew (3, sizeof(uart_rx_data), &dataQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -149,6 +153,7 @@ void MX_FREERTOS_Init(void)
   /* add events, ... */
 
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_AppMotor_Task */
@@ -173,7 +178,7 @@ void AppMotor_Task(void *argument)
         Motor_BIT_2 | SW_BIT_1, // flag bits to wait for
         pdFALSE,                // clear these bits when the function responds
         pdFALSE,                // Whether to wait for all flag bits
-        100                     // Whether to wait indefinitely
+        200                     // Whether to wait indefinitely
                                 // portMAX_DELAY    // Whether to wait indefinitely
     );
     if (((Motor_Event_Bit & Motor_BIT_2) != 0) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
@@ -181,12 +186,12 @@ void AppMotor_Task(void *argument)
       vTaskDelay(200);
        printf("预电机模式\n");
     }
-    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式）
+    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式�?
     {
       vTaskDelay(200);
 			 EventBits_t uxBits = xEventGroupGetBits(All_EventHandle);
 			  for (int i = 31; i >= 0; i--) {
-        // 检查第i位是否为1
+        // �?查第i位是否为1
         if (uxBits & (1 << i)) {
             printf("1");
         } else {
@@ -196,10 +201,10 @@ void AppMotor_Task(void *argument)
       printf("正式脉动模式");
     }
 
-    TMC5130_Write(0xa0, 1); // 设置tmc电机方向向前
-    vTaskDelay(1000);
-    TMC5130_Write(0xa0, 2);
-    vTaskDelay(1000);
+    // TMC5130_Write(0xa0, 1); // 设置tmc电机方向向前
+    // vTaskDelay(1000);
+    // TMC5130_Write(0xa0, 2);
+    // vTaskDelay(1000);
   }
 
   /* USER CODE END AppMotor_Task */
@@ -233,23 +238,25 @@ void APP_HeatTask(void *argument)
     if (((Heat_Event_Bit & Heat_BIT_0) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
     {
 
-      vTaskDelay(100);
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
-       printf("预加热模式\n");
-    }
-    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式）
-    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式）
-    {
-      printf("正式加热模式");
-      vTaskDelay(100);
+    //printf("预加热模式\n");
+     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+       vTaskDelay(100);
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-      // printf("Temperature:%f\n", EyeTmp);
+       printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
       snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-      // printf("PWM:%s\n", HeatPWMVal_str);
+       printf("PWM:%s\n", HeatPWMVal_str);
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-      // ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+        ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
+    }
+    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?
+    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式�?
+    {
+      printf("正式加热模式");
+        vTaskDelay(100);
+     
+       
     }
   }
 
@@ -264,16 +271,16 @@ void APP_HeatTask(void *argument)
         portMAX_DELAY    // Whether to wait indefinitely
     );
 
-    // 只有当BIT_0被设置时执行代码块1
+    // 只有当BIT_0被设置时执行代码�?1
     if ((Heat_Event_Bit & BIT_0) == BIT_0 && (Heat_Event_Bit & BIT_1) == 0)
     {
-        // 执行代码块1
+        // 执行代码�?1
     }
 
-    // 当BIT_0和BIT_1同时设置时只执行代码块2
+    // 当BIT_0和BIT_1同时设置时只执行代码�?2
     else if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1))
     {
-        // 执行代码块2
+        // 执行代码�?2
     }
 }
 
@@ -315,3 +322,4 @@ void App_Uart_ProcessTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+
