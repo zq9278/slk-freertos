@@ -142,7 +142,7 @@ void Error_Handler(void);
 #define Heat_BIT_0 (1 << 0)
 #define SW_BIT_1 (1 << 1)
 #define Motor_BIT_2 (1 <<2)
-#define Preheating_BIT_3 (1 <<3)
+#define Auto_BIT_3 (1 <<3)
 #define PreMotor_BIT_4 (1 <<4)
 
 #define TMP114Address		0x92
@@ -159,7 +159,7 @@ void Error_Handler(void);
 #ifndef __uart_data_type
 #define __uart_data_type
 typedef struct {
-    uint8_t buffer[50];   // 指坑数杮的指�?
+    uint8_t buffer[50];   // 指坑数杮的指�?
     uint16_t length;  // 数杮长度
 } uart_data; 
 #endif

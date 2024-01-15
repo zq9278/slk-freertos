@@ -270,7 +270,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
-  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�??关检测状�??
+  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)|| ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�??关检测状�??
   {
     if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�??关是否被按下
     {
@@ -289,6 +289,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
         xEventGroupClearBits(All_EventHandle, Motor_BIT_2);  // 清除加热事件
         xEventGroupClearBits(All_EventHandle, SW_BIT_1);  // 清除加热事件
         xEventGroupClearBits(All_EventHandle, Heat_BIT_0);  // 清除加热事件
+        xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
         //xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
         
         

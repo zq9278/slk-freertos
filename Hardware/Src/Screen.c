@@ -78,27 +78,29 @@ void processData(PCTRL_MSG msg)
             xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
         	break;
 
-        // /*自动模式开始*/
-        // case 0x1037:
-        // 	// ForceSet=ScreenCmdData/50;//设定压力
-        // 	// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
-        // 	// WorkMode = 0x03;
-        //     xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
-        //      xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定脉动任务开启标志位
-        // 	break;
+        /*自动模式开始*/
+        case 0x1037:
+        	// ForceSet=ScreenCmdData/50;//设定压力
+        	// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
+        	// WorkMode = 0x03;
+            // xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
+            //  xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定脉动任务开启标志位
+             xEventGroupSetBits(All_EventHandle, Auto_BIT_3); // 设定自动任务开启标志位
+        	break;
 
-        // /*自动模式结束*/
-        // case 0x1038:
-        // 	// WorkMode=0;
-        // 	// HeatPower(OFF);
-        // 	// HeatPWMVal=0;
-        // 	// HAL_TIM_Base_Stop_IT(&htim6);
-        // 	// Tim6Cnt=0;
-        // 	// MotorState=0;
-        // 	// MotorChecking();
-        //     xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
-        //     xEventGroupClearBits(All_EventHandle, Motor_BIT_2); // 清除脉动任务开启标志位
-        // 	break;
+        /*自动模式结束*/
+        case 0x1038:
+        	// WorkMode=0;
+        	// HeatPower(OFF);
+        	// HeatPWMVal=0;
+        	// HAL_TIM_Base_Stop_IT(&htim6);
+        	// Tim6Cnt=0;
+        	// MotorState=0;
+        	// MotorChecking();
+            // xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
+            // xEventGroupClearBits(All_EventHandle, Motor_BIT_2); // 清除脉动任务开启标志位
+            xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
+        	break;
 
     default:
         break;
@@ -136,4 +138,109 @@ void ScreenUpdateTemperature(float value, uint16_t work_mode)
     SendBuff[12] = 0xFF;
 
     HAL_UART_Transmit_DMA(&huart1, SendBuff, 13);
+}
+
+void ScreenUpdateForce(uint32_t value,uint16_t work_mode)
+{
+	
+	
+	Forcevalue=(uint16_t)(value/HX711_SCALE_FACTOR_10*6);
+	
+	while(hdma_usart1_tx.State!=HAL_DMA_STATE_READY);
+	// if(WorkMode==0x06)
+	// {
+	// 	SendBuff[4]=0x07;
+	// 	SendBuff[6]=0x02;
+	// }
+	// else if(WorkMode==0x07)
+	// {
+	// 	SendBuff[4]=0x0C;
+	// 	SendBuff[6]=0x04;
+	// }
+    SendBuff[4] = (work_mode >> 8) & 0xFF; // 高字节
+    SendBuff[6] = work_mode & 0xFF;        // 低字节
+	SendBuff[0]=0xEE;
+	SendBuff[1]=0xB1;
+	SendBuff[2]=0x10;
+	SendBuff[3]=0x00;
+	
+	SendBuff[5]=0x00;
+	
+	SendBuff[7]=Forcevalue/100+'0';
+	SendBuff[8]=Forcevalue/10%10+'0';
+	SendBuff[9]=Forcevalue%10+'0';
+	SendBuff[10]=0xFF;
+	SendBuff[11]=0xFC;
+	SendBuff[12]=0xFF;
+	SendBuff[13]=0xFF;
+	
+	
+	HAL_UART_Transmit_DMA(&huart1,SendBuff,14);	
+}
+
+void ScreenUpdateSOC(uint16_t value,uint8_t state)
+{
+	uint8_t SOCvalue;
+	SOCvalue=value/20;
+	if(SOCvalue==5)SOCvalue=4;
+	if(state==1 || state==2)SOCvalue+=5;
+	while(hdma_usart1_tx.State!=HAL_DMA_STATE_READY);
+	SendBuff[0]=0xEE;
+	SendBuff[1]=0xB1;
+	SendBuff[2]=0x23;
+	SendBuff[3]=0x00;
+	SendBuff[4]=0x1E;
+	SendBuff[5]=0x27;
+	SendBuff[6]=0x15;
+	SendBuff[7]=SOCvalue;
+	SendBuff[8]=0xFF;
+	SendBuff[9]=0xFC;
+	SendBuff[10]=0xFF;
+	SendBuff[11]=0xFF;
+	
+	HAL_UART_Transmit_DMA(&huart1,SendBuff,12);	
+}
+
+void ScreenWorkModeQuit(uint8_t workmodenumber)
+{
+	while(hdma_usart1_tx.State!=HAL_DMA_STATE_READY);
+	SendBuff[0]=0xEE;
+	SendBuff[1]=0xB1;
+	SendBuff[2]=0x10;
+	SendBuff[3]=0x00;
+	// if(workmodenumber==0x05)SendBuff[4]=0x03;
+	// if(workmodenumber==0x06)SendBuff[4]=0x07;
+	// if(workmodenumber==0x07)SendBuff[4]=0x0C;
+	SendBuff[4]=workmodenumber;
+	SendBuff[5]=0x00;
+	SendBuff[6]=0x07;
+	SendBuff[7]=0x32;
+	SendBuff[8]=0xFF;
+	SendBuff[9]=0xFC;
+	SendBuff[10]=0xFF;
+	SendBuff[11]=0xFF;
+	
+	HAL_UART_Transmit_DMA(&huart1,SendBuff,12);	
+}
+
+void ScreenTimerStart(uint8_t workmodenumber)
+{
+	while(hdma_usart1_tx.State!=HAL_DMA_STATE_READY);
+	SendBuff[0]=0xEE;
+	SendBuff[1]=0xB1;
+	SendBuff[2]=0x10;
+	SendBuff[3]=0x00;
+	// if(workmodenumber==0x05)SendBuff[4]=0x03;
+	// if(workmodenumber==0x06)SendBuff[4]=0x07;
+	// if(workmodenumber==0x07)SendBuff[4]=0x0C;
+    	SendBuff[4]=workmodenumber;
+	SendBuff[5]=0x00;
+	SendBuff[6]=0x07;
+	SendBuff[7]=0x31;
+	SendBuff[8]=0xFF;
+	SendBuff[9]=0xFC;
+	SendBuff[10]=0xFF;
+	SendBuff[11]=0xFF;
+	
+	HAL_UART_Transmit_DMA(&huart1,SendBuff,12);	
 }

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [SLK-FreeRTOS\SLK-FreeRTOS.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image SLK-FreeRTOS\SLK-FreeRTOS.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Jan 15 18:04:26 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Jan 15 21:39:00 2024
 <BR><P>
 <H3>Maximum Stack Usage =        224 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -451,7 +451,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32g070xx.o(RESET)
 </UL>
-<P><STRONG><a name="[33]"></a>APP_HeatTask</STRONG> (Thumb, 144 bytes, Stack size 8 bytes, app_freertos.o(i.APP_HeatTask))
+<P><STRONG><a name="[33]"></a>APP_HeatTask</STRONG> (Thumb, 154 bytes, Stack size 8 bytes, app_freertos.o(i.APP_HeatTask))
 <BR><BR>[Stack]<UL><LI>Max Depth = 108<LI>Call Chain = APP_HeatTask &rArr; TMP114_Read &rArr; HAL_I2C_Mem_Read_DMA &rArr; HAL_DMA_Start_IT &rArr; DMA_SetConfig
 </UL>
 <BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xEventGroupWaitBits
@@ -467,7 +467,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> app_freertos.o(i.MX_FREERTOS_Init)
 </UL>
-<P><STRONG><a name="[32]"></a>AppMotor_Task</STRONG> (Thumb, 120 bytes, Stack size 8 bytes, app_freertos.o(i.AppMotor_Task))
+<P><STRONG><a name="[32]"></a>AppMotor_Task</STRONG> (Thumb, 128 bytes, Stack size 8 bytes, app_freertos.o(i.AppMotor_Task))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = AppMotor_Task &rArr; TMC5130_Init &rArr; TMC5130_Write &rArr; HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFifoStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xEventGroupWaitBits
@@ -654,7 +654,7 @@ Global Symbols
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_DMA
 </UL>
 
-<P><STRONG><a name="[88]"></a>HAL_GPIO_EXTI_Falling_Callback</STRONG> (Thumb, 76 bytes, Stack size 16 bytes, stm32g0xx_it.o(i.HAL_GPIO_EXTI_Falling_Callback))
+<P><STRONG><a name="[88]"></a>HAL_GPIO_EXTI_Falling_Callback</STRONG> (Thumb, 88 bytes, Stack size 16 bytes, stm32g0xx_it.o(i.HAL_GPIO_EXTI_Falling_Callback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = HAL_GPIO_EXTI_Falling_Callback &rArr; xEventGroupSetBitsFromISR &rArr; xTimerPendFunctionCallFromISR &rArr; xQueueGenericSendFromISR &rArr; prvCopyDataToQueue &rArr; xTaskPriorityDisinherit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xEventGroupSetBitsFromISR
@@ -1668,7 +1668,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_FREERTOS_Init
 </UL>
 
-<P><STRONG><a name="[6a]"></a>processData</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, screen.o(i.processData))
+<P><STRONG><a name="[6a]"></a>processData</STRONG> (Thumb, 96 bytes, Stack size 8 bytes, screen.o(i.processData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = processData &rArr; xEventGroupSetBits &rArr; xTaskResumeAll &rArr; xTaskIncrementTick
 </UL>
 <BR>[Calls]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;xEventGroupClearBits

@@ -47,6 +47,12 @@ typedef struct
 void processData(PCTRL_MSG msg);
 void ScreenUpdateTemperature(float value,uint16_t work_mode);
 
+void SendDataToScreen(uint8_t* Data,uint8_t len);
+void ScreenUpdateForce(uint32_t value,uint16_t work_mode);
+void ScreenUpdateSOC(uint16_t value,uint8_t state);
+void ScreenWorkModeQuit(uint8_t workmodenumber);
+void ScreenTimerStart(uint8_t workmodenumber);
+
 // 在这里放置你的函数声明、类型定义等
 
 #endif // 结束 #ifndef 块

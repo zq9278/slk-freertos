@@ -170,18 +170,18 @@ void AppMotor_Task(void *argument)
   {
     Motor_Event_Bit = xEventGroupWaitBits(
         All_EventHandle,        // Event group handle
-        Motor_BIT_2 | SW_BIT_1, // flag bits to wait for
+        Motor_BIT_2 |Auto_BIT_3| SW_BIT_1, // flag bits to wait for
         pdFALSE,                // clear these bits when the function responds
         pdFALSE,                // Whether to wait for all flag bits
         200                     // Whether to wait indefinitely
                                 // portMAX_DELAY    // Whether to wait indefinitely
     );
-    if (((Motor_Event_Bit & Motor_BIT_2) != 0) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
+    if ((((Motor_Event_Bit & Motor_BIT_2) != 0)|| ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或者自动事件发生，按钮事件没发生（预热模式）
     {
       vTaskDelay(200);
       printf("预电机模式\n");
     }
-    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式�?
+    else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1))||(Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或者自动事件发生，按钮事件发生（正式脉动模式�?
     {
       vTaskDelay(200);
       EventBits_t uxBits = xEventGroupGetBits(All_EventHandle);
@@ -226,7 +226,7 @@ void APP_HeatTask(void *argument)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
         All_EventHandle,       // Event group handle
-        Heat_BIT_0 | SW_BIT_1, // flag bits to wait for
+        Heat_BIT_0 | Auto_BIT_3|SW_BIT_1, // flag bits to wait for
         pdFALSE,               // clear these bits when the function responds
         pdFALSE,               // Whether to wait for all flag bits
         100                    // Whether to wait indefinitely
@@ -234,7 +234,7 @@ void APP_HeatTask(void *argument)
     );
     // if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
     // if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
-    if (((Heat_Event_Bit & Heat_BIT_0) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热事件发生，按钮事件没发生（预热模式）
+    if ((((Heat_Event_Bit & Heat_BIT_0)||((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式）
     {
       // printf("预加热模式\n");
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
@@ -249,7 +249,7 @@ void APP_HeatTask(void *argument)
       ScreenUpdateTemperature(EyeTmp, 0x0302); // send data to the serial screen
     }
     // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?
-    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式�?
+    else if (((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1))||((Heat_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1))) // 加热或者自动事件发生，按钮事件发生（正式加热模式�?
     {
       printf("正式加热模式");
         vTaskDelay(100);
@@ -302,9 +302,31 @@ void App_Uart_ProcessTask(void *argument)
   __HAL_TIM_ENABLE_DMA(&htim16, TIM_DMA_CC1);
   sendColor(0, 0, 25);
   UCS1903Show();
+  EventBits_t Data_Event_Bit;
+
   for (;;)
   {
+    Data_Event_Bit = xEventGroupWaitBits(
+        All_EventHandle,       // Event group handle
+        Heat_BIT_0 | Auto_BIT_3|SW_BIT_1, // flag bits to wait for
+        pdFALSE,               // clear these bits when the function responds
+        pdFALSE,               // Whether to wait for all flag bits
+        100                    // Whether to wait indefinitely
+                               // portMAX_DELAY    // Whether to wait indefinitely
+    );
     // vTaskDelay(50);
+    if(Data_Event_Bit & Heat_BIT_0)
+    {
+
+    }
+    if(Data_Event_Bit & Motor_BIT_2)
+    {
+      
+    }
+    if(Data_Event_Bit & Auto_BIT_3)
+    {
+      
+    }
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
     if (xQueueReceive(dataQueueHandle, &uart_rx_data, 10)) // 阻塞接受队列消息
     {
