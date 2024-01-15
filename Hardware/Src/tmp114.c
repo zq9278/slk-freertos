@@ -47,10 +47,10 @@ float TmpRaw2Ture(uint8_t* TmpRawData)
 {
 	int16_t TmpData;
 	TmpData=(TmpRawData[0]<<8) | TmpRawData[1];
-	//TmpData = TmpData >> 4;
+	TmpData = TmpData >> 4;
 
 	//TmpData=(TmpRawData[0]<<4) | (TmpRawData[1]>>4);
-	return TmpData*0.0078125;
+	//return TmpData*0.0078125;
 	
-	//return TmpData*0.0625;
+	return TmpData*0.0625;
 }

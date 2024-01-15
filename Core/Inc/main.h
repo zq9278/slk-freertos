@@ -145,7 +145,7 @@ void Error_Handler(void);
 #define Preheating_BIT_3 (1 <<3)
 #define PreMotor_BIT_4 (1 <<4)
 
-#define TMP114Address		0x90
+#define TMP114Address		0x92
 //#define TMP114Address		0x90
 //#include "retarget.h"
 
