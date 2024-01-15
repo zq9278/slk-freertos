@@ -22,6 +22,7 @@
         "stm32g0xx_hal.h": "c",
         "limits": "c",
         "ucs1903.h": "c",
-        "tmp114.h": "c"
+        "tmp114.h": "c",
+        "event_groups.h": "c"
     }
 }

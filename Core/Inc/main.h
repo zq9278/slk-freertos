@@ -146,6 +146,7 @@ void Error_Handler(void);
 #define PreMotor_BIT_4 (1 <<4)
 
 #define TMP114Address		0x90
+//#define TMP114Address		0x90
 //#include "retarget.h"
 
 
@@ -158,8 +159,8 @@ void Error_Handler(void);
 #ifndef __uart_data_type
 #define __uart_data_type
 typedef struct {
-    uint8_t buffer[50];   // 指向数据的指�?
-    uint16_t length;  // 数据长度
+    uint8_t buffer[50];   // 指坑数杮的指�?
+    uint16_t length;  // 数杮长度
 } uart_data; 
 #endif
 

@@ -255,7 +255,7 @@ void USART1_IRQHandler(void)
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
     // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
     uart_RX_data.length = rx_index;
-    xQueueSendFromISR(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�????
+    xQueueSend(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�????
     rx_index = 0;                                            //
   }
 

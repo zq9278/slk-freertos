@@ -17,8 +17,9 @@ void TMP114_Init(void)
 }  
 
 void TMP114_Read(uint8_t ReadAddr,uint8_t* pBuffer)   
-{ 	
+{ 	//HAL_I2C_Master_Transmit(&hi2c2, TMP114Address,&ReadAddr, 1, HAL_MAX_DELAY);
 	HAL_I2C_Mem_Read_DMA(&hi2c2, TMP114Address, ReadAddr,I2C_MEMADD_SIZE_8BIT, pBuffer,2);
+	//HAL_I2C_Master_Receive(&hi2c2, TMP114Address, pBuffer, 2, HAL_MAX_DELAY);
 }  
 
 void TMP114_MultiRead(uint8_t* pBuffer)   
@@ -46,5 +47,10 @@ float TmpRaw2Ture(uint8_t* TmpRawData)
 {
 	int16_t TmpData;
 	TmpData=(TmpRawData[0]<<8) | TmpRawData[1];
+	//TmpData = TmpData >> 4;
+
+	//TmpData=(TmpRawData[0]<<4) | (TmpRawData[1]>>4);
 	return TmpData*0.0078125;
+	
+	//return TmpData*0.0625;
 }

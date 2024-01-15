@@ -186,12 +186,12 @@ void AppMotor_Task(void *argument)
       vTaskDelay(200);
        printf("预电机模式\n");
     }
-    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式�?
+    else if ((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) // 电机事件发生，按钮事件发生（正式脉动模式�?
     {
       vTaskDelay(200);
 			 EventBits_t uxBits = xEventGroupGetBits(All_EventHandle);
 			  for (int i = 31; i >= 0; i--) {
-        // �?查第i位是否为1
+        // �?查第i位是否为1
         if (uxBits & (1 << i)) {
             printf("1");
         } else {
@@ -250,8 +250,8 @@ void APP_HeatTask(void *argument)
       __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
         ScreenUpdateTemperature(EyeTmp, 0x0302);                   // send data to the serial screen
     }
-    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?
-    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式�?
+    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?
+    else if ((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) // 加热事件发生，按钮事件发生（正式加热模式�?
     {
       printf("正式加热模式");
         vTaskDelay(100);
@@ -271,16 +271,16 @@ void APP_HeatTask(void *argument)
         portMAX_DELAY    // Whether to wait indefinitely
     );
 
-    // 只有当BIT_0被设置时执行代码�?1
+    // 只有当BIT_0被设置时执行代码�?1
     if ((Heat_Event_Bit & BIT_0) == BIT_0 && (Heat_Event_Bit & BIT_1) == 0)
     {
-        // 执行代码�?1
+        // 执行代码�?1
     }
 
-    // 当BIT_0和BIT_1同时设置时只执行代码�?2
+    // 当BIT_0和BIT_1同时设置时只执行代码�?2
     else if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1))
     {
-        // 执行代码�?2
+        // 执行代码�?2
     }
 }
 
@@ -309,7 +309,7 @@ void App_Uart_ProcessTask(void *argument)
   {
     // vTaskDelay(50);
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-    if (xQueueReceive(dataQueueHandle, &uart_rx_data, 10)) // 阻塞接受队列消息
+    if (xQueueReceive(dataQueueHandle, &uart_rx_data, 1000)) // 阻塞接受队列消息
     {
       // HAL_UART_Transmit(&huart1, (uint8_t *)&(uart_rx_data.buffer), uart_rx_data.length, 0xFFFF);
       processData((PCTRL_MSG)uart_rx_data.buffer); // 处理接收到的数据
