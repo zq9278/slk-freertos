@@ -63,3 +63,4 @@ slk-freertos\app_freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/
 slk-freertos\app_freertos.o: ../Hardware/Inc/pid.h
 slk-freertos\app_freertos.o: ../Hardware/Inc/tmp114.h
 slk-freertos\app_freertos.o: ../Hardware/Inc/ucs1903.h
+slk-freertos\app_freertos.o: ../Hardware/Inc/hx711.h

@@ -50,7 +50,9 @@ const char *str = "interrupt";
 uint8_t rx_buffer[RX_BUFFER_SIZE];
 uart_data uart_RX_data;
 uint8_t rx_index = 0;
-// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如�??0�??
+uint8_t last_byte = 0;
+int frame_started = 0;
+// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如�????0�????
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -239,24 +241,33 @@ void USART1_IRQHandler(void)
   //  {
   //    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
   //    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�????
-  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�????
+  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�??????
+  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�??????
   //     HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�????启DMA
+  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�??????启DMA
   //  }
 
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
   {
     uint8_t received_data = (uint8_t)(huart1.Instance->RDR & 0xFF); // ?????UART??
-    uart_RX_data.buffer[rx_index++] = received_data;
+   if (last_byte == 0x5A && received_data == 0xA5) {
+        frame_started = 1;  // 标记帧的�?�?
+        uart_RX_data.buffer[0] = 0x5A;  
+        rx_index = 1;       // 重置索引
+    }
+    last_byte = received_data;  // 更新上一个字�?
+      if (frame_started) {
+    uart_RX_data.buffer[rx_index++] = received_data;                                                               
+      }
   }
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
   {
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
     // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
     uart_RX_data.length = rx_index;
-    xQueueSend(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�????
-    rx_index = 0;                                            //
+    xQueueSend(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�??????
+    //rx_index = 0;                                            //
+    frame_started = 0;  // 标记帧的结束
   }
 
   /* USER CODE END USART1_IRQn 0 */
@@ -270,16 +281,16 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
-  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)|| ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�??关检测状�??
+  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0)|| ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�????关检测状�????
   {
-    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�??关是否被按下
+    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�????关是否被按下
     {
-      // 设置事件组的标志�??
-      if ((xBits & SW_BIT_1) == 0) // �??关事件是否发�??
+      // 设置事件组的标志�????
+      if ((xBits & SW_BIT_1) == 0) // �????关事件是否发�????
       {
         // 如果SW_BIT_1当前是清除的，那么设置它
         // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
-        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�??关事件发�??
+        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�????关事件发�????
       }
       else
       {
@@ -289,7 +300,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
         xEventGroupClearBits(All_EventHandle, Motor_BIT_2);  // 清除加热事件
         xEventGroupClearBits(All_EventHandle, SW_BIT_1);  // 清除加热事件
         xEventGroupClearBits(All_EventHandle, Heat_BIT_0);  // 清除加热事件
-        xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
+        xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务�??启标志位
         //xEventGroupClearBitsFromISR(All_EventHandle, Heat_BIT_0);  // 清除加热事件
         
         

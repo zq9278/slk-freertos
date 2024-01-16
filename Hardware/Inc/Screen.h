@@ -43,6 +43,9 @@ typedef struct
     uint16_t data;
 
 } CTRL_MSG, *PCTRL_MSG;
+#define FILTER_SIZE 3//滤波长度
+float processFilter(float *buffer);
+uint32_t processFilter_force(uint32_t *buffer);
 
 void processData(PCTRL_MSG msg);
 void ScreenUpdateTemperature(float value,uint16_t work_mode);

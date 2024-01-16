@@ -63,4 +63,5 @@ slk-freertos\stm32g0xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/
 slk-freertos\stm32g0xx_it.o: ../Hardware/Inc/pid.h
 slk-freertos\stm32g0xx_it.o: ../Hardware/Inc/tmp114.h
 slk-freertos\stm32g0xx_it.o: ../Hardware/Inc/ucs1903.h
+slk-freertos\stm32g0xx_it.o: ../Hardware/Inc/hx711.h
 slk-freertos\stm32g0xx_it.o: ../Core/Inc/stm32g0xx_it.h

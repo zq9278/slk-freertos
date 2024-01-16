@@ -64,3 +64,4 @@ slk-freertos\gpio.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h
 slk-freertos\gpio.o: ../Hardware/Inc/pid.h
 slk-freertos\gpio.o: ../Hardware/Inc/tmp114.h
 slk-freertos\gpio.o: ../Hardware/Inc/ucs1903.h
+slk-freertos\gpio.o: ../Hardware/Inc/hx711.h

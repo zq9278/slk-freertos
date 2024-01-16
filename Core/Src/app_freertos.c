@@ -57,33 +57,52 @@ extern PID_typedef HeatPID;
 
 const char *str1 = "queue";
 char HeatPWMVal_str[3];
+float temperature;
+int Force;
+int32_t ForceRawActual;
+  int32_t ForceRawOffset;
 /* USER CODE END Variables */
 /* Definitions for Motor_Task */
 osThreadId_t Motor_TaskHandle;
 const osThreadAttr_t Motor_Task_attributes = {
-    .name = "Motor_Task",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "Motor_Task",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for HeatTask */
 osThreadId_t HeatTaskHandle;
 const osThreadAttr_t HeatTask_attributes = {
-    .name = "HeatTask",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 128 * 4};
+  .name = "HeatTask",
+  .priority = (osPriority_t) osPriorityNormal,
+  .stack_size = 128 * 4
+};
 /* Definitions for Uart_ProcessTas */
 osThreadId_t Uart_ProcessTasHandle;
 const osThreadAttr_t Uart_ProcessTas_attributes = {
-    .name = "Uart_ProcessTas",
-    .priority = (osPriority_t)osPriorityNormal,
-    .stack_size = 130 * 4};
+  .name = "Uart_ProcessTas",
+  .priority = (osPriority_t) osPriorityHigh,
+  .stack_size = 130 * 4
+};
 /* Definitions for dataQueue */
 osMessageQueueId_t dataQueueHandle;
 const osMessageQueueAttr_t dataQueue_attributes = {
-    .name = "dataQueue"};
+  .name = "dataQueue"
+};
+/* Definitions for Temperature_Queue */
+osMessageQueueId_t Temperature_QueueHandle;
+const osMessageQueueAttr_t Temperature_Queue_attributes = {
+  .name = "Temperature_Queue"
+};
+/* Definitions for Force_Queue */
+osMessageQueueId_t Force_QueueHandle;
+const osMessageQueueAttr_t Force_Queue_attributes = {
+  .name = "Force_Queue"
+};
 /* Definitions for All_Event */
 osEventFlagsId_t All_EventHandle;
 const osEventFlagsAttr_t All_Event_attributes = {
-    .name = "All_Event"};
+  .name = "All_Event"
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -97,12 +116,11 @@ void App_Uart_ProcessTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
-void MX_FREERTOS_Init(void)
-{
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -121,7 +139,13 @@ void MX_FREERTOS_Init(void)
 
   /* Create the queue(s) */
   /* creation of dataQueue */
-  dataQueueHandle = osMessageQueueNew(3, sizeof(uart_rx_data), &dataQueue_attributes);
+  dataQueueHandle = osMessageQueueNew (3, sizeof(uart_rx_data), &dataQueue_attributes);
+
+  /* creation of Temperature_Queue */
+  Temperature_QueueHandle = osMessageQueueNew (100, sizeof(float), &Temperature_Queue_attributes);
+
+  /* creation of Force_Queue */
+  Force_QueueHandle = osMessageQueueNew (10, sizeof(float), &Force_Queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -149,6 +173,7 @@ void MX_FREERTOS_Init(void)
   /* add events, ... */
 
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_AppMotor_Task */
@@ -161,42 +186,36 @@ void MX_FREERTOS_Init(void)
 void AppMotor_Task(void *argument)
 {
   /* USER CODE BEGIN AppMotor_Task */
+  
   EventBits_t Motor_Event_Bit;
 
   TMC5130_Init();
+  HX711_Init();
   HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
   TMC5130_Write(0xa7, 0x20000);
   for (;;)
   {
     Motor_Event_Bit = xEventGroupWaitBits(
-        All_EventHandle,        // Event group handle
-        Motor_BIT_2 |Auto_BIT_3| SW_BIT_1, // flag bits to wait for
-        pdFALSE,                // clear these bits when the function responds
-        pdFALSE,                // Whether to wait for all flag bits
-        200                     // Whether to wait indefinitely
-                                // portMAX_DELAY    // Whether to wait indefinitely
+        All_EventHandle,                     // Event group handle
+        Motor_BIT_2 | Auto_BIT_3 | SW_BIT_1, // flag bits to wait for
+        pdFALSE,                             // clear these bits when the function responds
+        pdFALSE,                             // Whether to wait for all flag bits
+        200                                  // Whether to wait indefinitely
+                                             // portMAX_DELAY    // Whether to wait indefinitely
     );
-    if ((((Motor_Event_Bit & Motor_BIT_2) != 0)|| ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或者自动事件发生，按钮事件没发生（预热模式）
+    if ((((Motor_Event_Bit & Motor_BIT_2) != 0) || ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或�?�自动事件发生，按钮事件没发生（预热模式�????
     {
-      vTaskDelay(200);
-      printf("预电机模式\n");
+      //vTaskDelay(200);
+      //printf("预电机模式\n");
+      
+      ForceRawActual=HX711_Read();
+      Force=(ForceRawActual - ForceRawOffset < 0) ? 0 : (ForceRawActual - ForceRawOffset);
+      xQueueSend(Force_QueueHandle, &Force, NULL);
     }
-    else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1))||(Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或者自动事件发生，按钮事件发生（正式脉动模式�?
+    else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) || (Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式�?
     {
       vTaskDelay(200);
-      EventBits_t uxBits = xEventGroupGetBits(All_EventHandle);
-      for (int i = 31; i >= 0; i--)
-      {
-        // �?查第i位是否为1
-        if (uxBits & (1 << i))
-        {
-          printf("1");
-        }
-        else
-        {
-          printf("0");
-        }
-      }
+    
       printf("正式脉动模式");
     }
 
@@ -225,63 +244,36 @@ void APP_HeatTask(void *argument)
   for (;;)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
-        All_EventHandle,       // Event group handle
-        Heat_BIT_0 | Auto_BIT_3|SW_BIT_1, // flag bits to wait for
-        pdFALSE,               // clear these bits when the function responds
-        pdFALSE,               // Whether to wait for all flag bits
-        100                    // Whether to wait indefinitely
-                               // portMAX_DELAY    // Whether to wait indefinitely
+        All_EventHandle,                    // Event group handle
+        Heat_BIT_0 | Auto_BIT_3 | SW_BIT_1, // flag bits to wait for
+        pdFALSE,                            // clear these bits when the function responds
+        pdFALSE,                            // Whether to wait for all flag bits
+        100                                 // Whether to wait indefinitely
+                                            // portMAX_DELAY                      // Whether to wait indefinitely
     );
     // if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1)) {
     // if ( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) == 0))//加热事件发生，按钮事件没发生（预热模式）
-    if ((((Heat_Event_Bit & Heat_BIT_0)||((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式）
+    if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�????
     {
       // printf("预加热模式\n");
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
       vTaskDelay(100);
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
-      printf("Temperature:%f\n", EyeTmp);
+      xQueueSend(Temperature_QueueHandle, &EyeTmp, NULL);
+      // printf("Temperature:%f\n", EyeTmp);
       HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
-      snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
-      printf("PWM:%s\n", HeatPWMVal_str);
-    __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
-      ScreenUpdateTemperature(EyeTmp, 0x0302); // send data to the serial screen
+      // snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+      //  printf("PWM:%s\n", HeatPWMVal_str);
+      __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
     }
-    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?
-    else if (((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1))||((Heat_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1))) // 加热或者自动事件发生，按钮事件发生（正式加热模式�?
+    // else if( ((Heat_Event_Bit & Heat_BIT_0) != 0)&&((Heat_Event_Bit & SW_BIT_1) != 0))//加热事件发生，按钮事件发生（正式加热模式�?????
+    else if (((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) || ((Heat_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1))) // 加热或�?�自动事件发生，按钮事件发生（正式加热模式�?
     {
       printf("正式加热模式");
-        vTaskDelay(100);
-
+      vTaskDelay(100);
     }
   }
-
-  /*
-  for (;;)
-{
-    Heat_Event_Bit = xEventGroupWaitBits(
-        All_EventHandle, // Event group handle
-        BIT_0 | BIT_1,   // flag bits to wait for
-        pdFALSE,         // clear these bits when the function responds
-        pdFALSE,         // Wait for any flag bit
-        portMAX_DELAY    // Whether to wait indefinitely
-    );
-
-    // 只有当BIT_0被设置时执行代码�?1
-    if ((Heat_Event_Bit & BIT_0) == BIT_0 && (Heat_Event_Bit & BIT_1) == 0)
-    {
-        // 执行代码�?1
-    }
-
-    // 当BIT_0和BIT_1同时设置时只执行代码�?2
-    else if ((Heat_Event_Bit & (BIT_0 | BIT_1)) == (BIT_0 | BIT_1))
-    {
-        // 执行代码�?2
-    }
-}
-
-  */
 
   /* USER CODE END APP_HeatTask */
 }
@@ -300,32 +292,86 @@ void App_Uart_ProcessTask(void *argument)
   // HAL_TIM_Base_Start(&htim16);
   // HAL_TIM_PWM_Start(&htim16, LED_TIM_CHANNEL);
   __HAL_TIM_ENABLE_DMA(&htim16, TIM_DMA_CC1);
-  sendColor(0, 0, 25);
-  UCS1903Show();
+  // sendColor(0, 0, 25);
+  // UCS1903Show();
   EventBits_t Data_Event_Bit;
+  float temperature_buffer[FILTER_SIZE] = {0};
+  uint32_t Force_buffer[FILTER_SIZE] = {0};
+  int buffer_index = 0;
+  int buffer_index_Force = 0;
 
   for (;;)
   {
-    Data_Event_Bit = xEventGroupWaitBits(
-        All_EventHandle,       // Event group handle
-        Heat_BIT_0 | Auto_BIT_3|SW_BIT_1, // flag bits to wait for
-        pdFALSE,               // clear these bits when the function responds
-        pdFALSE,               // Whether to wait for all flag bits
-        100                    // Whether to wait indefinitely
-                               // portMAX_DELAY    // Whether to wait indefinitely
-    );
-    // vTaskDelay(50);
-    if(Data_Event_Bit & Heat_BIT_0)
-    {
 
+    Data_Event_Bit = xEventGroupWaitBits(
+        All_EventHandle,                    // Event group handle
+        Heat_BIT_0 | Auto_BIT_3 | Motor_BIT_2|SW_BIT_1, // flag bits to wait for
+        pdFALSE,                            // clear these bits when the function responds
+        pdFALSE,                            // Whether to wait for all flag bits
+        100                                 // Whether to wait indefinitely
+                                            // portMAX_DELAY    // Whether to wait indefinitely
+    );
+    //vTaskDelay(100);
+
+    if ((Data_Event_Bit & Heat_BIT_0) != 0)
+
+    {//printf("打开热敷数据");
+      if (xQueueReceive(Temperature_QueueHandle, &temperature, 10)) // 阻塞接受温度队列消息
+      {
+        temperature_buffer[buffer_index] = temperature;  // 取出队列的数�??
+        buffer_index = (buffer_index + 1) % FILTER_SIZE; // 累加到缓冲区
+        if (buffer_index == 0)                           // 当达到预设平均滤波数量时，平均一�??
+        {
+          float filtered_temperature = processFilter(temperature_buffer); // 计算均�??
+          ScreenUpdateTemperature(filtered_temperature, 0x0302);          // 向屏幕发送数�?
+          // HAL_UART_Transmit(&huart1, (uint8_t *)&filtered_temperature, sizeof(float), 0xFFFF);
+        }
+      }
     }
-    if(Data_Event_Bit & Motor_BIT_2)
-    {
-      
+    if ((Data_Event_Bit & Motor_BIT_2) != 0)
+    {//printf("打开压力数据");
+      if (xQueueReceive(Force_QueueHandle, &Force, 10)) // 阻塞接受温度队列消息
+      {
+        Force_buffer[buffer_index_Force] = Force;        // 取出队列的数�??
+        buffer_index_Force = (buffer_index_Force + 1) % FILTER_SIZE; // 累加到缓冲区
+           ScreenUpdateForce(Force, 0x0702);          // 向屏幕发送数�?
+        if (buffer_index_Force == 0)                           // 当达到预设平均滤波数量时，平均一�??
+        {
+          //uint32_t filtered_Force = processFilter_force(Force_buffer); // 计算均�??
+          //ScreenUpdateForce(filtered_Force, 0x0702);          // 向屏幕发送数�?
+          // HAL_UART_Transmit(&huart1, (uint8_t *)&filtered_temperature, sizeof(float), 0xFFFF);
+        }
+      }
     }
-    if(Data_Event_Bit & Auto_BIT_3)
-    {
-      
+    if ((Data_Event_Bit & Auto_BIT_3) != 0)
+    {//printf("打开自动数据");
+
+      if (xQueueReceive(Temperature_QueueHandle, &temperature, 10)) // 阻塞接受温度队列消息
+      {
+        temperature_buffer[buffer_index] = temperature;  // 取出队列的数�??
+        buffer_index = (buffer_index + 1) % FILTER_SIZE; // 累加到缓冲区
+        if (buffer_index == 0)                           // 当达到预设平均滤波数量时，平均一�??
+        {
+          float filtered_temperature = processFilter(temperature_buffer);
+          //printf("%f\n", filtered_temperature);
+          ScreenUpdateTemperature(filtered_temperature, 0x0C03); 
+          // HAL_UART_Transmit(&huart1, (uint8_t *)&filtered_temperature, sizeof(float), 0xFFFF);
+        }
+      }
+
+
+
+      if (xQueueReceive(Force_QueueHandle, &Force, 10)) // 阻塞接受压力队列消息
+      {
+        Force_buffer[buffer_index_Force] = Force;        // 取出队列的数�??
+        buffer_index_Force = (buffer_index_Force + 1) % FILTER_SIZE; // 累加到缓冲区
+        if (buffer_index_Force == 0)                           // 当达到预设平均滤波数量时，平均一�??
+        {
+          float filtered_Force = processFilter_force(Force_buffer); // 计算均�??
+          ScreenUpdateForce(filtered_Force, 0x0C04);          // 向屏幕发送数�?        // 向屏幕发送数�?
+          // HAL_UART_Transmit(&huart1, (uint8_t *)&filtered_temperature, sizeof(float), 0xFFFF);
+        }
+      }
     }
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
     if (xQueueReceive(dataQueueHandle, &uart_rx_data, 10)) // 阻塞接受队列消息
@@ -341,3 +387,4 @@ void App_Uart_ProcessTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+

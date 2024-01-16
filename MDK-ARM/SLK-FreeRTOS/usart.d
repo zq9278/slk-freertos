@@ -64,3 +64,4 @@ slk-freertos\usart.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/timers.
 slk-freertos\usart.o: ../Hardware/Inc/pid.h
 slk-freertos\usart.o: ../Hardware/Inc/tmp114.h
 slk-freertos\usart.o: ../Hardware/Inc/ucs1903.h
+slk-freertos\usart.o: ../Hardware/Inc/hx711.h

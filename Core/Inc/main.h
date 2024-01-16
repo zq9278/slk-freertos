@@ -138,6 +138,7 @@ void Error_Handler(void);
 #include "pid.h"
 #include "tmp114.h"
 #include "ucs1903.h"
+#include "hx711.h"
 
 #define Heat_BIT_0 (1 << 0)
 #define SW_BIT_1 (1 << 1)
@@ -159,7 +160,7 @@ void Error_Handler(void);
 #ifndef __uart_data_type
 #define __uart_data_type
 typedef struct {
-    uint8_t buffer[50];   // 指坑数杮的指�?
+    uint8_t buffer[50];   // 指坑数杮的指�??
     uint16_t length;  // 数杮长度
 } uart_data; 
 #endif
