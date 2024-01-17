@@ -4,7 +4,7 @@
 
 
 /*motor*/
-uint32_t MotorSpeed=0x6000;
+uint32_t MotorSpeed=0x2000;
 
 /*motor*/
 
@@ -175,12 +175,14 @@ uint8_t MotorCompare(int32_t SetData,int32_t CompareData)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,2);
+		vTaskDelay(100);
 		return 2;
 	}
 	else if(SubData<-ForceSen)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,1);
+		vTaskDelay(100);
 		return 1;
 	}
 	else
@@ -191,3 +193,28 @@ uint8_t MotorCompare(int32_t SetData,int32_t CompareData)
 	}
 }
 
+// void MotorCompare(int32_t SetData,int32_t CompareData)
+// {
+// 	int32_t SubData;
+// 	SubData=CompareData-SetData;
+// 	if(SubData>ForceSen)
+// 	{
+// 		TMC5130_Write(0xa7,MotorSpeed);
+// 		TMC5130_Write(0xa0,2);
+// 		vTaskDelay(100);
+		
+// 	}
+// 	else if(SubData<-ForceSen)
+// 	{
+// 		TMC5130_Write(0xa7,MotorSpeed);
+// 		TMC5130_Write(0xa0,1);
+// 		vTaskDelay(100);
+		
+// 	}
+// 	else
+// 	{
+// 		TMC5130_Write(0xa7,0);
+// 		TMC5130_Write(0xa0,0);
+		
+// 	}
+// }

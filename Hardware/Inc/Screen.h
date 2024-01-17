@@ -35,15 +35,15 @@
 //     kCtrlQRCode,                          //二维码
 // };
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     uint32_t cmd_head; // 帧头
     uint16_t cmd_type; // 命令类型(UPDATE_CONTROL)
     uint8_t control_type;  // 控件类型
-    uint16_t data;
+    uint16_t data;                                                                                                                              
 
 } CTRL_MSG, *PCTRL_MSG;
-#define FILTER_SIZE 3//滤波长度
+#define FILTER_SIZE 5//滤波长度
 float processFilter(float *buffer);
 uint32_t processFilter_force(uint32_t *buffer);
 

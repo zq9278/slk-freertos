@@ -50,7 +50,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern uint8_t MotorCompareState;
+uint8_t counter;//定时�?7的计数器
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,6 +102,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM14_Init();
   MX_TIM16_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -188,7 +190,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+ if(htim==&htim7)//50ms定时�?
+	{
+    // �?1ms发�?��?�知
+    counter++;
+    if( (counter==60)&&(MotorCompareState==0)) {
+        // 发�?�任务�?�知给任�?2
+        MotorCompareState=1;
+    } 
+    if( (counter==100 )&&(MotorCompareState==1) ){
+        // 发�?�任务�?�知给任�?1
+        MotorCompareState=0;
+       counter=0;
+    }
 
+    // �?5ms发�?��?�知
+    
+  }
   /* USER CODE END Callback 1 */
 }
 
