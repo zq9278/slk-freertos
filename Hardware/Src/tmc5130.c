@@ -4,7 +4,7 @@
 
 
 /*motor*/
-uint32_t MotorSpeed=0x2000;
+uint32_t MotorSpeed=0x4000;
 
 /*motor*/
 
@@ -175,14 +175,14 @@ uint8_t MotorCompare(int32_t SetData,int32_t CompareData)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,2);
-		vTaskDelay(100);
+		vTaskDelay(10);
 		return 2;
 	}
 	else if(SubData<-ForceSen)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,1);
-		vTaskDelay(100);
+		vTaskDelay(10);
 		return 1;
 	}
 	else
