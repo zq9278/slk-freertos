@@ -408,8 +408,8 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
-  if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�????????关检测状�????????
-  {
+  // if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�????????关检测状�????????
+  // {
     // if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�????????关是否被按下
     // {
     //   // 设置事件组的标志�????????
@@ -473,7 +473,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     if (GPIO_Pin == SW_CNT_Pin) // 假设 SW_CNT_Pin 是你的按键对应的 GPIO pin
     {
       // 检查两次按键事件之间的时间差
-      if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(1000))
+      if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(200))
       {
         // 更新上一次按键时间
         xLastWakeTime = xCurrentTime;
@@ -536,6 +536,6 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
       }
     }
   }
-}
+//}
 
 /* USER CODE END 1 */
