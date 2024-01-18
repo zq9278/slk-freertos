@@ -3,6 +3,9 @@
 uint8_t HeatPWMVal=0;
 
 PID_typedef HeatPID;
+extern uint8_t EyeTmpRaw[2];
+extern float EyeTmp;
+extern TIM_HandleTypeDef htim14;
 
 void HeatPIDInit(void)
 {
@@ -32,7 +35,18 @@ uint8_t PID_realize(PID_typedef *pid,float temp_val)
     return pid->actual_val;
 }
 
-
+void start_Heat(osMessageQueueId_t Temperature_QueueHandle,float Temp_set){
+	 // printf("预加热模式\n");
+	 HeatPID.target_val=Temp_set;
+      TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
+      EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
+      xQueueSend(Temperature_QueueHandle, &EyeTmp, NULL);
+      // printf("Temperature:%f\n", EyeTmp);
+      HeatPWMVal = PID_realize(&HeatPID, EyeTmp); // Obtain PWM value through PID algorithm
+      // snprintf(HeatPWMVal_str, sizeof(HeatPWMVal_str), "%02X", HeatPWMVal);
+      //  printf("PWM:%s\n", HeatPWMVal_str);
+      __HAL_TIM_SET_COMPARE(&htim14, TIM_CHANNEL_1, HeatPWMVal); // enable timer comparison to generate PWM
+}
 
 
 

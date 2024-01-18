@@ -44,6 +44,7 @@ typedef struct __attribute__((packed))
 
 } CTRL_MSG, *PCTRL_MSG;
 #define FILTER_SIZE 5//滤波长度
+#define FILTER_SIZE_TEMP 3//滤波长度
 float processFilter(float *buffer);
 uint32_t processFilter_force(uint32_t *buffer);
 
@@ -56,6 +57,8 @@ void ScreenUpdateSOC(uint16_t value,uint8_t state);
 void ScreenWorkModeQuit(uint8_t workmodenumber);
 void ScreenTimerStart(uint8_t workmodenumber);
 
+void ProcessForceData(uint16_t work_mode);
+void ProcessTemperatureData(uint16_t work_mode); 
 // 在这里放置你的函数声明、类型定义等
 
 #endif // 结束 #ifndef 块

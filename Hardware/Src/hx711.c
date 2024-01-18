@@ -1,6 +1,6 @@
 #include "hx711.h"
 
-extern int32_t ForceRawOffset;
+ int32_t ForceRawOffset;
 
 /* HX711 初始化 */
 void HX711_Init(void)

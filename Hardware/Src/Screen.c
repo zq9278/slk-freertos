@@ -6,6 +6,17 @@ uint8_t cmd_buffer[CMD_MAX_SIZE]; // 指令缓存
 
 extern EventGroupHandle_t All_EventHandle;
 extern TIM_HandleTypeDef htim14;
+extern TIM_HandleTypeDef htim7;
+extern uint8_t MotorCompareState;
+
+float temperature_buffer[FILTER_SIZE] = {0};
+int buffer_index = 0;
+uint32_t Force_buffer[FILTER_SIZE] = {0};
+int buffer_index_Force = 0;
+float temperature;
+int Force;
+extern osMessageQueueId_t Temperature_QueueHandle;
+extern QueueHandle_t Force_QueueHandle;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 const EventBits_t xBitsToSet = Heat_BIT_0;
 const EventBits_t xBitsToSet1 = Motor_BIT_2;
@@ -13,28 +24,28 @@ uint8_t SendBuff[12];
 int32_t ForceRawSet = 422672; // 屏幕设定的值
 
 void processData(PCTRL_MSG msg)
-{ // HAL_UART_Transmit(&huart1, (uint8_t *)msg, sizeof(CTRL_MSG), 0xFFFF);
-  //  解决大端小端问题。stm32是大端处理
+{									   // HAL_UART_Transmit(&huart1, (uint8_t *)msg, sizeof(CTRL_MSG), 0xFFFF);
+									   //  解决大端小端问题。stm32是大端处理
 	uint32_t cmd_head = msg->cmd_head; // 指令类型
 	cmd_head = ((cmd_head & 0x000000FF) << 24) |
-	           ((cmd_head & 0x0000FF00) << 8) |
-	           ((cmd_head & 0x00FF0000) >> 8) |
-	           ((cmd_head & 0xFF000000) >> 24);
+			   ((cmd_head & 0x0000FF00) << 8) |
+			   ((cmd_head & 0x00FF0000) >> 8) |
+			   ((cmd_head & 0xFF000000) >> 24);
 	uint16_t cmd_type = msg->cmd_type; // 指令类型
 	cmd_type = ((cmd_type & 0x00FF) << 8) |
-	           ((cmd_type & 0xFF00) >> 8);
+			   ((cmd_type & 0xFF00) >> 8);
 	uint8_t control_type = msg->control_type; // 指令类型
 	uint16_t data = msg->data;				  // 指令类型
 	data = ((data & 0x00FF) << 8) |
-	       ((data & 0xFF00) >> 8);
-	//HAL_UART_Transmit(&huart1, (uint8_t *)&(data), sizeof(data), 0xFFFF);
-	// //为每个变量创建字符串缓冲区
-	// char cmd_head_str[9];     // uint32_t 转换为16进制字符串需要8个字符 + '\0'
-	// char cmd_type_str[5];     // uint16_t 转换为16进制字符串需要4个字符 + '\0'
-	// char control_type_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
-	// char data2_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
-	// char data_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
-	// //char data_str[5];         // uint16_t 转换为16进制字符串需要4个字符 + '\0'
+		   ((data & 0xFF00) >> 8);
+	// HAL_UART_Transmit(&huart1, (uint8_t *)&(data), sizeof(data), 0xFFFF);
+	//  //为每个变量创建字符串缓冲区
+	//  char cmd_head_str[9];     // uint32_t 转换为16进制字符串需要8个字符 + '\0'
+	//  char cmd_type_str[5];     // uint16_t 转换为16进制字符串需要4个字符 + '\0'
+	//  char control_type_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
+	//  char data2_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
+	//  char data_str[3]; // uint8_t 转换为16进制字符串需要2个字符 + '\0'
+	//  //char data_str[5];         // uint16_t 转换为16进制字符串需要4个字符 + '\0'
 
 	// // 将数值转换为16进制字符串
 	// snprintf(cmd_head_str, sizeof(cmd_head_str), "%08X", cmd_head);
@@ -53,113 +64,139 @@ void processData(PCTRL_MSG msg)
 		/*热敷开始*/
 
 	case 0x1041:
+
 		HeatPIDInit();
 		TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
-		ScreenTimerStart(0x03);
 		break;
 
 	/*热敷结束*/
 	case 0x1030:
+		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		   // enable pwm for heating film
 		xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
+		xQueueReset(Temperature_QueueHandle);
 		ScreenWorkModeQuit(0x03);
 		// 发送停止位
 		break;
 
 	/*脉动开始*/
 	case 0x1005:
+
 		data = data / 80; // 设定压力
-		// HAL_UART_Transmit(&huart1, (uint8_t *)&data, sizeof(uint16_t), 0xFFFF);
-		 ForceRawSet = data * HX711_SCALE_FACTOR;
-		// WorkMode = 0x02;
+						  // HAL_UART_Transmit(&huart1, (uint8_t *)&data, sizeof(uint16_t), 0xFFFF);
+		ForceRawSet = data * HX711_SCALE_FACTOR;
+		MotorCompareState = 0;
+
 		xEventGroupSetBits(All_EventHandle, xBitsToSet1); // 设定脉动任务开启标志位
-		ScreenTimerStart(0x07);
 		break;
 
 	/*脉动结束*/
 	case 0x1034:
-		// WorkMode=0;
-		// HAL_TIM_Base_Stop_IT(&htim6);
-		// Tim6Cnt=0;
-		// MotorState=0;
-		// MotorChecking();
 		ScreenWorkModeQuit(0x07);
 		xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
-		MotorChecking();
-
+															// MotorChecking();
+		HAL_TIM_Base_Stop_IT(&htim7);
+		HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+		TMC5130_Write(0xa7, 0x10000);
+		TMC5130_Write(0xa0, 2);
+		xQueueReset(Force_QueueHandle);
 		break;
 
 	/*自动模式开始*/
 	case 0x1037:
-		// ForceSet=ScreenCmdData/50;//设定压力
-		// ForceRawSet=ForceSet*HX711_SCALE_FACTOR;
-		// WorkMode = 0x03;
-		// xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
-		//  xEventGroupSetBits(All_EventHandle, Motor_BIT_2); // 设定脉动任务开启标志位
-		ScreenTimerStart(0x0C);
+
+		data = data / 80; // 设定压力
+						  // HAL_UART_Transmit(&huart1, (uint8_t *)&data, sizeof(uint16_t), 0xFFFF);
+		ForceRawSet = data * HX711_SCALE_FACTOR;
+		// WorkMode = 0x02;
+		MotorCompareState = 0;
+
+		HeatPIDInit();
+		TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, Auto_BIT_3); // 设定自动任务开启标志位
+		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
 		break;
 
 	/*自动模式结束*/
 	case 0x1038:
-		// WorkMode=0;
-		// HeatPower(OFF);
-		// HeatPWMVal=0;
-		// HAL_TIM_Base_Stop_IT(&htim6);
-		// Tim6Cnt=0;
-		// MotorState=0;
-		// MotorChecking();
-		// xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
-		// xEventGroupClearBits(All_EventHandle, Motor_BIT_2); // 清除脉动任务开启标志位
 		ScreenWorkModeQuit(0x0C);
 		xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
-
+		MotorChecking();
+		HAL_TIM_Base_Stop_IT(&htim7);
+		xQueueReset(Temperature_QueueHandle);
 		break;
-
 	default:
 		break;
+	}
+}
+
+void ProcessTemperatureData(uint16_t work_mode)
+{
+	if (xQueueReceive(Temperature_QueueHandle, &temperature, 10))
+	{
+		temperature_buffer[buffer_index] = temperature;
+		buffer_index = (buffer_index + 1) % FILTER_SIZE_TEMP;
+		if (buffer_index == 0)
+		{
+			float filtered_temperature = processFilter(temperature_buffer);
+			ScreenUpdateTemperature(filtered_temperature, work_mode);
+			ScreenUpdateTemperature(filtered_temperature, 0x0302);
+		}
+	}
+}
+void ProcessForceData(uint16_t work_mode)
+{
+	if (xQueueReceive(Force_QueueHandle, &Force, 10))
+	{
+		Force_buffer[buffer_index_Force] = Force;
+		buffer_index_Force = (buffer_index_Force + 1) % FILTER_SIZE;
+		if (buffer_index_Force == 0)
+		{
+			uint32_t filtered_Force = processFilter_force(Force_buffer);
+			ScreenUpdateForce(filtered_Force, work_mode);
+			ScreenUpdateForce(filtered_Force, 0x0702);
+		}
 	}
 }
 
 float processFilter(float *buffer)
 {
 	float sum = 0;
-	for (int i = 0; i < FILTER_SIZE; i++)
+	for (int i = 0; i < FILTER_SIZE_TEMP; i++)
 	{
 		sum += buffer[i];
 	}
-	return sum / FILTER_SIZE; // 这里使用简单的平均值滤波
+	return sum / FILTER_SIZE_TEMP; // 这里使用简单的平均值滤波
 }
 uint32_t processFilter_force(uint32_t *buffer)
 {
-    // 对数组进行排序
-    for (int i = 0; i < FILTER_SIZE - 1; i++)
-    {
-        for (int j = 0; j < FILTER_SIZE - i - 1; j++)
-        {
-            if (buffer[j] > buffer[j + 1])
-            {
-                // 交换 buffer[j] 和 buffer[j + 1]
-                uint32_t temp = buffer[j];
-                buffer[j] = buffer[j + 1];
-                buffer[j + 1] = temp;
-            }
-        }
-    }
+	// 对数组进行排序
+	for (int i = 0; i < FILTER_SIZE - 1; i++)
+	{
+		for (int j = 0; j < FILTER_SIZE - i - 1; j++)
+		{
+			if (buffer[j] > buffer[j + 1])
+			{
+				// 交换 buffer[j] 和 buffer[j + 1]
+				uint32_t temp = buffer[j];
+				buffer[j] = buffer[j + 1];
+				buffer[j + 1] = temp;
+			}
+		}
+	}
 
-    // 如果 FILTER_SIZE 是奇数，返回中间的值
-    // 如果是偶数，返回中间两个值的平均值
-    if (FILTER_SIZE % 2 != 0)
-    {
-        return buffer[FILTER_SIZE / 2];
-    }
-    else
-    {
-        return (buffer[(FILTER_SIZE - 1) / 2] + buffer[FILTER_SIZE / 2]) / 2;
-    }
+	// 如果 FILTER_SIZE 是奇数，返回中间的值
+	// 如果是偶数，返回中间两个值的平均值
+	if (FILTER_SIZE % 2 != 0)
+	{
+		return buffer[FILTER_SIZE / 2];
+	}
+	else
+	{
+		return (buffer[(FILTER_SIZE - 1) / 2] + buffer[FILTER_SIZE / 2]) / 2;
+	}
 }
-
 
 void ScreenUpdateTemperature(float value, uint16_t work_mode)
 {
@@ -168,12 +205,6 @@ void ScreenUpdateTemperature(float value, uint16_t work_mode)
 	Tmpvalue = value + 0.5f;
 	while (hdma_usart1_tx.State != HAL_DMA_STATE_READY)
 		;
-
-	// SendBuff[4]=0x03;
-	// SendBuff[6]=0x02;
-
-	// SendBuff[4]=0x0C;
-	// SendBuff[6]=0x03;
 	SendBuff[4] = (work_mode >> 8) & 0xFF; // 高字节
 	SendBuff[6] = work_mode & 0xFF;		   // 低字节
 
@@ -198,20 +229,10 @@ void ScreenUpdateForce(uint32_t value, uint16_t work_mode)
 {
 	// printf("%u",value);
 
-	uint16_t Forcevalue = (uint16_t)(value / HX711_SCALE_FACTOR * 88);
+	uint16_t Forcevalue = (uint16_t)(value / HX711_SCALE_FACTOR * 80);
 
 	while (hdma_usart1_tx.State != HAL_DMA_STATE_READY)
 		;
-	// if(WorkMode==0x06)
-	// {
-	// 	SendBuff[4]=0x07;
-	// 	SendBuff[6]=0x02;
-	// }
-	// else if(WorkMode==0x07)
-	// {
-	// 	SendBuff[4]=0x0C;
-	// 	SendBuff[6]=0x04;
-	// }
 	SendBuff[4] = (work_mode >> 8) & 0xFF; // 高字节
 	SendBuff[6] = work_mode & 0xFF;		   // 低字节
 	SendBuff[0] = 0xEE;
@@ -228,7 +249,6 @@ void ScreenUpdateForce(uint32_t value, uint16_t work_mode)
 	SendBuff[11] = 0xFC;
 	SendBuff[12] = 0xFF;
 	SendBuff[13] = 0xFF;
-
 	HAL_UART_Transmit_DMA(&huart1, SendBuff, 14);
 }
 
@@ -266,9 +286,6 @@ void ScreenWorkModeQuit(uint8_t workmodenumber)
 	SendBuff[1] = 0xB1;
 	SendBuff[2] = 0x10;
 	SendBuff[3] = 0x00;
-	// if(workmodenumber==0x05)SendBuff[4]=0x03;
-	// if(workmodenumber==0x06)SendBuff[4]=0x07;
-	// if(workmodenumber==0x07)SendBuff[4]=0x0C;
 	SendBuff[4] = workmodenumber;
 	SendBuff[5] = 0x00;
 	SendBuff[6] = 0x07;
@@ -289,9 +306,6 @@ void ScreenTimerStart(uint8_t workmodenumber)
 	SendBuff[1] = 0xB1;
 	SendBuff[2] = 0x10;
 	SendBuff[3] = 0x00;
-	// if(workmodenumber==0x05)SendBuff[4]=0x03;
-	// if(workmodenumber==0x06)SendBuff[4]=0x07;
-	// if(workmodenumber==0x07)SendBuff[4]=0x0C;
 	SendBuff[4] = workmodenumber;
 	SendBuff[5] = 0x00;
 	SendBuff[6] = 0x07;

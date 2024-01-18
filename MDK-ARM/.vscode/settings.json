@@ -25,6 +25,7 @@
         "tmp114.h": "c",
         "event_groups.h": "c",
         "hx711.h": "c",
-        "string": "c"
+        "string": "c",
+        "pid.h": "c"
     }
 }

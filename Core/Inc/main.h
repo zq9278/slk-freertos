@@ -108,6 +108,7 @@ void Error_Handler(void);
 #define TMC_ENN_GPIO_Port GPIOD
 #define CHG_DSEL_Pin GPIO_PIN_1
 #define CHG_DSEL_GPIO_Port GPIOD
+#define CHG_DSEL_EXTI_IRQn EXTI0_1_IRQn
 #define CHG_GPOUT_Pin GPIO_PIN_2
 #define CHG_GPOUT_GPIO_Port GPIOD
 #define CHG_CE_Pin GPIO_PIN_3
@@ -116,8 +117,10 @@ void Error_Handler(void);
 #define TMC_SCK_GPIO_Port GPIOB
 #define CHG_STAT_Pin GPIO_PIN_4
 #define CHG_STAT_GPIO_Port GPIOB
+#define CHG_STAT_EXTI_IRQn EXTI4_15_IRQn
 #define CHG_INT_Pin GPIO_PIN_5
 #define CHG_INT_GPIO_Port GPIOB
+#define CHG_INT_EXTI_IRQn EXTI4_15_IRQn
 #define CHG_SCL_Pin GPIO_PIN_8
 #define CHG_SCL_GPIO_Port GPIOB
 #define CHG_SDA_Pin GPIO_PIN_9
@@ -160,7 +163,7 @@ void Error_Handler(void);
 #ifndef __uart_data_type
 #define __uart_data_type
 typedef struct {
-    uint8_t buffer[50];   // 指坑数杮的指�??
+    uint8_t buffer[20];   // 指坑数杮的指�??
     uint16_t length;  // 数杮长度
 } uart_data; 
 #endif
