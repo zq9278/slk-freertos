@@ -168,7 +168,6 @@ void MX_FREERTOS_Init(void)
   /* Create the thread(s) */
   /* creation of Motor_Task */
   Motor_TaskHandle = osThreadNew(AppMotor_Task, NULL, &Motor_Task_attributes);
-
   /* creation of HeatTask */
   HeatTaskHandle = osThreadNew(APP_HeatTask, NULL, &HeatTask_attributes);
 
