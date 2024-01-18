@@ -19,9 +19,9 @@ typedef struct
     float maxOutput;
 }PID_typedef;
 
-void HeatPIDInit(void);
+void HeatPIDInit(float Temp_set);
 uint8_t PID_realize(PID_typedef *pid,float temp_val);
-void start_Heat(osMessageQueueId_t Temperature_QueueHandle,float Temp_set);
+void start_Heat(osMessageQueueId_t Temperature_QueueHandle);
 
 
 #endif

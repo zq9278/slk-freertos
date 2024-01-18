@@ -92,8 +92,8 @@ extern TIM_HandleTypeDef htim6;
 /*           Cortex-M0+ Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
-  * @brief This function handles Non maskable interrupt.
-  */
+ * @brief This function handles Non maskable interrupt.
+ */
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -107,8 +107,8 @@ void NMI_Handler(void)
 }
 
 /**
-  * @brief This function handles Hard fault interrupt.
-  */
+ * @brief This function handles Hard fault interrupt.
+ */
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -129,8 +129,8 @@ void HardFault_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles Flash global interrupt.
-  */
+ * @brief This function handles Flash global interrupt.
+ */
 void FLASH_IRQHandler(void)
 {
   /* USER CODE BEGIN FLASH_IRQn 0 */
@@ -143,8 +143,8 @@ void FLASH_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles RCC global interrupt.
-  */
+ * @brief This function handles RCC global interrupt.
+ */
 void RCC_IRQHandler(void)
 {
   /* USER CODE BEGIN RCC_IRQn 0 */
@@ -156,8 +156,8 @@ void RCC_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles EXTI line 0 and line 1 interrupts.
-  */
+ * @brief This function handles EXTI line 0 and line 1 interrupts.
+ */
 void EXTI0_1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_1_IRQn 0 */
@@ -170,8 +170,8 @@ void EXTI0_1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles EXTI line 2 and line 3 interrupts.
-  */
+ * @brief This function handles EXTI line 2 and line 3 interrupts.
+ */
 void EXTI2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
@@ -184,8 +184,8 @@ void EXTI2_3_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles EXTI line 4 to 15 interrupts.
-  */
+ * @brief This function handles EXTI line 4 to 15 interrupts.
+ */
 void EXTI4_15_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI4_15_IRQn 0 */
@@ -199,8 +199,8 @@ void EXTI4_15_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
-  */
+ * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
+ */
 void DMA1_Channel2_3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
@@ -213,8 +213,8 @@ void DMA1_Channel2_3_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
-  */
+ * @brief This function handles DMA1 channel 4, channel 5, channel 6, channel 7 and DMAMUX1 interrupts.
+ */
 void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Ch4_7_DMAMUX1_OVR_IRQn 0 */
@@ -230,8 +230,8 @@ void DMA1_Ch4_7_DMAMUX1_OVR_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles ADC1 interrupt.
-  */
+ * @brief This function handles ADC1 interrupt.
+ */
 void ADC1_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC1_IRQn 0 */
@@ -244,8 +244,8 @@ void ADC1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM6 global interrupt.
-  */
+ * @brief This function handles TIM6 global interrupt.
+ */
 void TIM6_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM6_IRQn 0 */
@@ -258,8 +258,8 @@ void TIM6_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM7 global interrupt.
-  */
+ * @brief This function handles TIM7 global interrupt.
+ */
 void TIM7_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM7_IRQn 0 */
@@ -272,8 +272,8 @@ void TIM7_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM14 global interrupt.
-  */
+ * @brief This function handles TIM14 global interrupt.
+ */
 void TIM14_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM14_IRQn 0 */
@@ -286,8 +286,8 @@ void TIM14_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM16 global interrupt.
-  */
+ * @brief This function handles TIM16 global interrupt.
+ */
 void TIM16_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM16_IRQn 0 */
@@ -300,16 +300,19 @@ void TIM16_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
-  */
+ * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
+ */
 void I2C1_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C1_IRQn 0 */
 
   /* USER CODE END I2C1_IRQn 0 */
-  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
+  if (hi2c1.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
+  {
     HAL_I2C_ER_IRQHandler(&hi2c1);
-  } else {
+  }
+  else
+  {
     HAL_I2C_EV_IRQHandler(&hi2c1);
   }
   /* USER CODE BEGIN I2C1_IRQn 1 */
@@ -318,16 +321,19 @@ void I2C1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I2C2 global interrupt.
-  */
+ * @brief This function handles I2C2 global interrupt.
+ */
 void I2C2_IRQHandler(void)
 {
   /* USER CODE BEGIN I2C2_IRQn 0 */
 
   /* USER CODE END I2C2_IRQn 0 */
-  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR)) {
+  if (hi2c2.Instance->ISR & (I2C_FLAG_BERR | I2C_FLAG_ARLO | I2C_FLAG_OVR))
+  {
     HAL_I2C_ER_IRQHandler(&hi2c2);
-  } else {
+  }
+  else
+  {
     HAL_I2C_EV_IRQHandler(&hi2c2);
   }
   /* USER CODE BEGIN I2C2_IRQn 1 */
@@ -336,8 +342,8 @@ void I2C2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles SPI1 global interrupt.
-  */
+ * @brief This function handles SPI1 global interrupt.
+ */
 void SPI1_IRQHandler(void)
 {
   /* USER CODE BEGIN SPI1_IRQn 0 */
@@ -350,8 +356,8 @@ void SPI1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
-  */
+ * @brief This function handles USART1 global interrupt / USART1 wake-up interrupt through EXTI line 25.
+ */
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
@@ -404,59 +410,128 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
   EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
   if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�????????关检测状�????????
   {
-    if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�????????关是否被按下
+    // if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�????????关是否被按下
+    // {
+    //   // 设置事件组的标志�????????
+    //   if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �????????关事件是否发�????????
+    //   {
+    //     // 如果SW_BIT_1当前是清除的，那么设置它
+    //     // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
+    //     xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�????????关事件发�????????
+
+    //     if ((xBits & Motor_BIT_2) != 0)
+    //     {
+    //       ScreenTimerStart(0x07);
+    //       HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+    //       TMC5130_Write(0xa7, 0x8000);
+    //       TMC5130_Write(0xa0, 1);
+    //     }
+    //     if (((xBits & Heat_BIT_0) != 0))
+    //     {
+    //       ScreenTimerStart(0x03);
+    //     }
+    //     if (((xBits & Auto_BIT_3) != 0))
+    //     {
+    //       HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+    //       TMC5130_Write(0xa7, 0x8000);
+    //       TMC5130_Write(0xa0, 1);
+    //       ScreenTimerStart(0x0C);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     // 如果SW_BIT_1当前是设置的，那么清除它
+
+    //     xEventGroupClearBits(All_EventHandle, SW_BIT_1);
+    //     if ((xBits & Heat_BIT_0) != 0)
+    //     {
+    //       ScreenWorkModeQuit(0x03);
+    //       xEventGroupClearBits(All_EventHandle, Heat_BIT_0); // 清除加热事件
+    //       xQueueReset(Temperature_QueueHandle);
+    //     }
+    //     if ((xBits & Motor_BIT_2) != 0)
+    //     {
+    //       ScreenWorkModeQuit(0x07);
+    //       xEventGroupClearBits(All_EventHandle, Motor_BIT_2);
+    //       MotorChecking();
+    //       xQueueReset(Force_QueueHandle);
+    //     }
+    //     if ((xBits & Auto_BIT_3) != 0)
+    //     {
+    //       ScreenWorkModeQuit(0x0C);
+    //       xEventGroupClearBits(All_EventHandle, Auto_BIT_3);
+    //       MotorChecking();
+    //       xQueueReset(Temperature_QueueHandle);
+    //       xQueueReset(Force_QueueHandle);
+    //     }
+    //   }
+    // }
+
+    static TickType_t xLastWakeTime = 0;
+    TickType_t xCurrentTime = xTaskGetTickCountFromISR();
+
+    if (GPIO_Pin == SW_CNT_Pin) // 假设 SW_CNT_Pin 是你的按键对应的 GPIO pin
     {
-      // 设置事件组的标志�????????
-      if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �????????关事件是否发�????????
+      // 检查两次按键事件之间的时间差
+      if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(1000))
       {
-        // 如果SW_BIT_1当前是清除的，那么设置它
-        // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
-        xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�????????关事件发�????????
+        // 更新上一次按键时间
+        xLastWakeTime = xCurrentTime;
 
-        if ((xBits & Motor_BIT_2) != 0)
+        // 设置事件组的标志�????????
+        if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �????????关事件是否发�????????
         {
-          ScreenTimerStart(0x07);
-          HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
-          TMC5130_Write(0xa7, 0x8000);
-          TMC5130_Write(0xa0, 1);
-        }
-        if (((xBits & Heat_BIT_0) != 0))
-        {
-          ScreenTimerStart(0x03);
-        }
-        if (((xBits & Auto_BIT_3) != 0))
-        {
-          HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
-          TMC5130_Write(0xa7, 0x8000);
-          TMC5130_Write(0xa0, 1);
-          ScreenTimerStart(0x0C);
-        }
-      }
-      else
-      {
-        // 如果SW_BIT_1当前是设置的，那么清除它
+          // 如果SW_BIT_1当前是清除的，那么设置它
+          // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
+          xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�????????关事件发�????????
 
-        xEventGroupClearBits(All_EventHandle, SW_BIT_1);
-        if ((xBits & Heat_BIT_0) != 0)
-        {
-          ScreenWorkModeQuit(0x03);
-          xEventGroupClearBits(All_EventHandle, Heat_BIT_0); // 清除加热事件
-          xQueueReset(Temperature_QueueHandle);
+          if ((xBits & Motor_BIT_2) != 0)
+          {
+            ScreenTimerStart(0x07);
+            HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+            TMC5130_Write(0xa7, 0x8000);
+            TMC5130_Write(0xa0, 1);
+          }
+          if (((xBits & Heat_BIT_0) != 0))
+          {
+            ScreenTimerStart(0x03);
+          }
+          if (((xBits & Auto_BIT_3) != 0))
+          {
+            HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+            TMC5130_Write(0xa7, 0x8000);
+            TMC5130_Write(0xa0, 1);
+            ScreenTimerStart(0x0C);
+          }
         }
-        if ((xBits & Motor_BIT_2) != 0)
+        else
         {
-          ScreenWorkModeQuit(0x07);
-          xEventGroupClearBits(All_EventHandle, Motor_BIT_2);
-          MotorChecking();
-          xQueueReset(Force_QueueHandle);
-        }
-        if ((xBits & Auto_BIT_3) != 0)
-        {
-          ScreenWorkModeQuit(0x0C);
-          xEventGroupClearBits(All_EventHandle, Auto_BIT_3);
-          MotorChecking();
-          xQueueReset(Temperature_QueueHandle);
-          xQueueReset(Force_QueueHandle);
+          // 如果SW_BIT_1当前是设置的，那么清除它
+
+          xEventGroupClearBits(All_EventHandle, SW_BIT_1);
+          if ((xBits & Heat_BIT_0) != 0)
+          {
+            ScreenWorkModeQuit(0x03);
+            xEventGroupClearBits(All_EventHandle, Heat_BIT_0); // 清除加热事件
+              HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		 // disable pwm for heating film
+            xQueueReset(Temperature_QueueHandle);
+          }
+          if ((xBits & Motor_BIT_2) != 0)
+          {
+            ScreenWorkModeQuit(0x07);
+            xEventGroupClearBits(All_EventHandle, Motor_BIT_2);
+             MotorChecking();
+            xQueueReset(Force_QueueHandle);
+          }
+          if ((xBits & Auto_BIT_3) != 0)
+          {
+            ScreenWorkModeQuit(0x0C);
+            xEventGroupClearBits(All_EventHandle, Auto_BIT_3);
+              HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		 // disable pwm for heating film
+             MotorChecking();
+            xQueueReset(Temperature_QueueHandle);
+            xQueueReset(Force_QueueHandle);
+          }
         }
       }
     }

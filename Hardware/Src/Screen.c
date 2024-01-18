@@ -65,8 +65,8 @@ void processData(PCTRL_MSG msg)
 
 	case 0x1041:
 
-		HeatPIDInit();
-		TMP114_Init();
+		HeatPIDInit(40.0);
+		// TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
 		break;
@@ -77,6 +77,7 @@ void processData(PCTRL_MSG msg)
 		xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
 		xQueueReset(Temperature_QueueHandle);
 		ScreenWorkModeQuit(0x03);
+		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
 		// 发送停止位
 		break;
 
@@ -97,23 +98,24 @@ void processData(PCTRL_MSG msg)
 		xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
 															// MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
-		HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
-		TMC5130_Write(0xa7, 0x10000);
-		TMC5130_Write(0xa0, 2);
+		// HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+		// TMC5130_Write(0xa7, 0x10000);
+		// TMC5130_Write(0xa0, 2);
+		MotorChecking();
 		xQueueReset(Force_QueueHandle);
 		break;
 
 	/*自动模式开始*/
 	case 0x1037:
-
+		HeatPIDInit(50.0);
 		data = data / 80; // 设定压力
 						  // HAL_UART_Transmit(&huart1, (uint8_t *)&data, sizeof(uint16_t), 0xFFFF);
 		ForceRawSet = data * HX711_SCALE_FACTOR;
 		// WorkMode = 0x02;
 		MotorCompareState = 0;
 
-		HeatPIDInit();
-		TMP114_Init();
+		// HeatPIDInit();
+		// TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, Auto_BIT_3); // 设定自动任务开启标志位
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
 		break;
@@ -124,6 +126,7 @@ void processData(PCTRL_MSG msg)
 		xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
 		MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
+		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
 		xQueueReset(Temperature_QueueHandle);
 		break;
 	default:

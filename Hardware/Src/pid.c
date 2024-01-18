@@ -7,9 +7,9 @@ extern uint8_t EyeTmpRaw[2];
 extern float EyeTmp;
 extern TIM_HandleTypeDef htim14;
 
-void HeatPIDInit(void)
+void HeatPIDInit(float Temp_set)
 {
-	HeatPID.target_val=60;
+	HeatPID.target_val=Temp_set;
 	HeatPID.actual_val=0; 
 	HeatPID.err=0;
 	HeatPID.err_last=0;
@@ -35,9 +35,8 @@ uint8_t PID_realize(PID_typedef *pid,float temp_val)
     return pid->actual_val;
 }
 
-void start_Heat(osMessageQueueId_t Temperature_QueueHandle,float Temp_set){
+void start_Heat(osMessageQueueId_t Temperature_QueueHandle){
 	 // printf("预加热模式\n");
-	 HeatPID.target_val=Temp_set;
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
       xQueueSend(Temperature_QueueHandle, &EyeTmp, NULL);

@@ -211,12 +211,12 @@ void AppMotor_Task(void *argument)
       {
       case 1:
         MotorCompare(ForceRawOffset + ForceRawSet, ForceRawActual);
-        vTaskDelay(100);
+        vTaskDelay(10);
         break;
       case 2:
         TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�?速度
         TMC5130_Write(0xa0, 2);
-        vTaskDelay(100);
+        vTaskDelay(10);
         break;
       default:
         break;
@@ -247,6 +247,7 @@ void APP_HeatTask(void *argument)
   /* USER CODE BEGIN APP_HeatTask */
   /* Infinite loop */
   EventBits_t Heat_Event_Bit;
+   // HeatPIDInit();
   for (;;)
   {
     Heat_Event_Bit = xEventGroupWaitBits(
@@ -261,13 +262,13 @@ void APP_HeatTask(void *argument)
     if((((Heat_Event_Bit & Heat_BIT_0) != 0)||((Heat_Event_Bit & Auto_BIT_3) != 0))&&((Heat_Event_Bit & SW_BIT_1) == 0))
     {
       // // printf("预加热模式\n");
-      start_Heat(Temperature_QueueHandle, 40);
+      start_Heat(Temperature_QueueHandle);
       vTaskDelay(200);
     }
     else if (((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) || ((Heat_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1))) // 加热或�?�自动事件发生，按钮事件发生（正式加热模式�?
     {
       // printf("正式加热模式");
-      start_Heat(Temperature_QueueHandle, 50);
+      start_Heat(Temperature_QueueHandle);
       vTaskDelay(200);
     }
   }
