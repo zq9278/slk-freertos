@@ -120,16 +120,15 @@ uint8_t MotorChecking()
 	uint32_t ReadCount=0;
 	uint8_t ReadData[4];
 	
-	//TMC_ENN(0);//���ʹ��
     HAL_GPIO_WritePin(TMC_ENN_GPIO_Port,TMC_ENN_Pin,GPIO_PIN_RESET);
 	TMC5130_Write(0xa7,0x10000);
 	VelocityModeMove(Negative);
 	do
 	{
-		TMC5130_Read(0x04,ReadData);
-		if((ReadData[3]&0x02)==0x00)
+		TMC5130_Read(0x04,ReadData);//读取位置寄存器
+		if((ReadData[3]&0x02)==0x00)//如果位置寄存器被设置
 		{
-			TMC5130_Read(0x04,ReadData);
+			TMC5130_Read(0x04,ReadData);//继续读位置寄存器
 		}
 		 vTaskDelay(1 / portTICK_PERIOD_MS);
 		ReadCount++;
@@ -138,11 +137,10 @@ uint8_t MotorChecking()
 			TMC5130_Write(0xa7,0);
 			return 0;
 		}
-	}while((ReadData[3]&0x02)==0x02);
+	}while((ReadData[3]&0x02)==0x02);//如果位置寄存器没被设置
 
 	MotorSetHome();
 	TMC5130_Write(0xa0,0x00000000);//λ��ģʽ
-	//TMC_ENN(1);//����ر�
     HAL_GPIO_WritePin(TMC_ENN_GPIO_Port,TMC_ENN_Pin,GPIO_PIN_SET);
 	return 1;
 }
@@ -175,14 +173,14 @@ uint8_t MotorCompare(int32_t SetData,int32_t CompareData)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,2);
-		vTaskDelay(10);
+		//vTaskDelay(200);
 		return 2;
 	}
 	else if(SubData<-ForceSen)
 	{
 		TMC5130_Write(0xa7,MotorSpeed);
 		TMC5130_Write(0xa0,1);
-		vTaskDelay(10);
+		
 		return 1;
 	}
 	else
