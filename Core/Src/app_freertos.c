@@ -146,6 +146,7 @@ void MX_FREERTOS_Init(void) {
   /* Create the thread(s) */
   /* creation of Motor_Task */
   Motor_TaskHandle = osThreadNew(AppMotor_Task, NULL, &Motor_Task_attributes);
+
   /* creation of HeatTask */
   HeatTaskHandle = osThreadNew(APP_HeatTask, NULL, &HeatTask_attributes);
 
@@ -196,7 +197,7 @@ void AppMotor_Task(void *argument)
     if ((((Motor_Event_Bit & Motor_BIT_2) != 0) || ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或�?�自动事件发生，按钮事件没发生（电机预模式）
     {
       vTaskDelay(200);
-      // printf("电机预模�?");
+      // printf("电机预模�??");
     }
     else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) || (Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式启动）
     {
@@ -214,7 +215,7 @@ void AppMotor_Task(void *argument)
         vTaskDelay(10);
         break;
       case 2:
-        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�?速度
+        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�??速度
         TMC5130_Write(0xa0, 2);
         vTaskDelay(10);
         break;
@@ -258,7 +259,7 @@ void APP_HeatTask(void *argument)
         100                                 // Whether to wait indefinitely
                                             // portMAX_DELAY                      // Whether to wait indefinitely
     );
-    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�??????????
+    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�???????????
     if((((Heat_Event_Bit & Heat_BIT_0) != 0)||((Heat_Event_Bit & Auto_BIT_3) != 0))&&((Heat_Event_Bit & SW_BIT_1) == 0))
     {
       // // printf("预加热模式\n");

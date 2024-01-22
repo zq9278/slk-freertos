@@ -75,6 +75,7 @@ void processData(PCTRL_MSG msg)
 	case 0x1030:
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		   // enable pwm for heating film
 		xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
+    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
 		xQueueReset(Temperature_QueueHandle);
 		ScreenWorkModeQuit(0x03);
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
@@ -96,6 +97,7 @@ void processData(PCTRL_MSG msg)
 	case 0x1034:
 		ScreenWorkModeQuit(0x07);
 		xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
+    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
 															// MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
 		// HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
@@ -124,6 +126,7 @@ void processData(PCTRL_MSG msg)
 	case 0x1038:
 		ScreenWorkModeQuit(0x0C);
 		xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
+    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
 		MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
@@ -232,7 +235,7 @@ void ScreenUpdateForce(uint32_t value, uint16_t work_mode)
 {
 	// printf("%u",value);
 
-	uint16_t Forcevalue = (uint16_t)(value / HX711_SCALE_FACTOR * 80);
+	uint16_t Forcevalue = (uint16_t)(value / HX711_SCALE_FACTOR * 75);
 
 	while (hdma_usart1_tx.State != HAL_DMA_STATE_READY)
 		;
