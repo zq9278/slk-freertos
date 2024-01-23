@@ -181,26 +181,29 @@ void AppMotor_Task(void *argument)
 
   EventBits_t Motor_Event_Bit;
 
-  TMC5130_Init();
+        TMC5130_Init();
   HX711_Init();
   MotorChecking();
   for (;;)
   {
+    
     Motor_Event_Bit = xEventGroupWaitBits(
         All_EventHandle,                     // Event group handle
         Motor_BIT_2 | Auto_BIT_3 | SW_BIT_1, // flag bits to wait for
         pdFALSE,                             // clear these bits when the function responds
         pdFALSE,                             // Whether to wait for all flag bits
-        200                                  // Whether to wait indefinitely
+        100                                  // Whether to wait indefinitely
                                              // portMAX_DELAY    // Whether to wait indefinitely
     );
     if ((((Motor_Event_Bit & Motor_BIT_2) != 0) || ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或�?�自动事件发生，按钮事件没发生（电机预模式）
     {
       vTaskDelay(200);
-      // printf("电机预模�??");
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+      // printf("电机预模�??");
     }
     else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) || (Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式启动）
-    {
+    { vTaskDelay(200);
+        //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
       ForceRawActual = HX711_Read();
       if ((ForceRawActual >= 550000) && (MotorCompareState == 0))
       // if ( (ForceRawActual-(ForceRawOffset + ForceRawSet))>42007)
@@ -215,7 +218,7 @@ void AppMotor_Task(void *argument)
         vTaskDelay(10);
         break;
       case 2:
-        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�??速度
+        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�??速度
         TMC5130_Write(0xa0, 2);
         vTaskDelay(10);
         break;
@@ -259,7 +262,7 @@ void APP_HeatTask(void *argument)
         100                                 // Whether to wait indefinitely
                                             // portMAX_DELAY                      // Whether to wait indefinitely
     );
-    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�???????????
+    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�???????????
     if((((Heat_Event_Bit & Heat_BIT_0) != 0)||((Heat_Event_Bit & Auto_BIT_3) != 0))&&((Heat_Event_Bit & SW_BIT_1) == 0))
     {
       // // printf("预加热模式\n");

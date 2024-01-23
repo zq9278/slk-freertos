@@ -468,7 +468,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 假设 SW_CNT_Pin 是你的按键对应的 GPIO pin
     {
       // �?查两次按键事件之间的时间�?
-      if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(1))
+      if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(50))
       {                                                                                
         // 更新上一次按键时�?
         xLastWakeTime = xCurrentTime;
@@ -516,7 +516,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
           {
             ScreenWorkModeQuit(0x07);
             xEventGroupClearBits(All_EventHandle, Motor_BIT_2);
-             MotorChecking();
+             //MotorChecking();
+              TMC5130_Write(0xa7, 0x8000);
+            TMC5130_Write(0xa0, 2);
             xQueueReset(Force_QueueHandle);
           }
           if ((xBits & Auto_BIT_3) != 0)
@@ -524,7 +526,9 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
             ScreenWorkModeQuit(0x0C);
             xEventGroupClearBits(All_EventHandle, Auto_BIT_3);
               HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		 // disable pwm for heating film
-             MotorChecking();
+             //MotorChecking();
+              TMC5130_Write(0xa7, 0x8000);
+            TMC5130_Write(0xa0, 2);     
             xQueueReset(Temperature_QueueHandle);
             xQueueReset(Force_QueueHandle);
           }

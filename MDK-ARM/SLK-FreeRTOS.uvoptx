@@ -152,34 +152,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>138</LineNumber>
+          <LineNumber>507</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134218068</Address>
+          <Address>134222662</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>startup_stm32g070xx.s</Filename>
+          <Filename>../Core/Src/stm32g0xx_it.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SLK_FreeRTOS\startup_stm32g070xx.s\138</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>137</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>startup_stm32g070xx.s</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\SLK_FreeRTOS\../Core/Src/stm32g0xx_it.c\507</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -232,6 +216,26 @@
           <count>9</count>
           <WinNumber>1</WinNumber>
           <ItemText>ForceRawActual</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart_RX_data</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart_RX_data</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>uart_RX_data.buffer[rx_index++]</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>received_data</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
