@@ -198,7 +198,7 @@ void AppMotor_Task(void *argument)
     if ((((Motor_Event_Bit & Motor_BIT_2) != 0) || ((Motor_Event_Bit & Auto_BIT_3) != 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或�?�自动事件发生，按钮事件没发生（电机预模式）
     {
       vTaskDelay(200);
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+        
       // printf("电机预模�??");
     }
     else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) || (Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式启动）
@@ -266,6 +266,7 @@ void APP_HeatTask(void *argument)
     if((((Heat_Event_Bit & Heat_BIT_0) != 0)||((Heat_Event_Bit & Auto_BIT_3) != 0))&&((Heat_Event_Bit & SW_BIT_1) == 0))
     {
       // // printf("预加热模式\n");
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
       start_Heat(Temperature_QueueHandle);
       vTaskDelay(200);
     }

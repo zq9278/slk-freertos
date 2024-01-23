@@ -30,12 +30,13 @@ uint8_t PID_realize(PID_typedef *pid,float temp_val)
     pid->integral+=pid->err;
     Limit(pid->integral,-pid->maxIntegral,pid->maxIntegral);
     pid->actual_val=pid->Kp*pid->err+pid->Ki*pid->integral+pid->Kd*(pid->err-pid->err_last);
-    Limit(pid->actual_val,-pid->maxOutput,pid->maxOutput);
+    Limit(pid->actual_val,0,pid->maxOutput);
     pid->err_last=pid->err;
     return pid->actual_val;
 }
 
 void start_Heat(osMessageQueueId_t Temperature_QueueHandle){
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
 	 // printf("预加热模式\n");
       TMP114_Read(0x00, EyeTmpRaw);    // obtain original value of the current temperature sensor by reading the iic
       EyeTmp = TmpRaw2Ture(EyeTmpRaw); // convert raw temperature data
