@@ -182,7 +182,7 @@ er
 WEAK]
   117 00000000                 IMPORT           __main
   118 00000000                 IMPORT           SystemInit
-  119 00000000 4804            LDR              R0, =SystemInit
+  119 00000000 4804    2       LDR              R0, =SystemInit
   120 00000002 4780            BLX              R0
   121 00000004 4804            LDR              R0, =__main
   122 00000006 4700            BX               R0
@@ -468,6 +468,14 @@ Symbol: __Vectors_End
 ARM Macro Assembler    Page 1 Alphabetic symbol ordering
 Relocatable symbols
 
+ 00000000
+
+Symbol: 
+   Definitions
+      None
+   Uses
+      None
+Warning:  undefinedComment:  unused
 .text 00000000
 
 Symbol: .text
@@ -519,6 +527,12 @@ Symbol: Default_Handler
       At line 149 in file startup_stm32g070xx.s
    Uses
       None
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
 Comment: Default_Handler unused
 EXTI0_1_IRQHandler 00000012
 
@@ -527,12 +541,6 @@ Symbol: EXTI0_1_IRQHandler
       At line 184 in file startup_stm32g070xx.s
    Uses
       At line 82 in file startup_stm32g070xx.s
-
-
-
-ARM Macro Assembler    Page 2 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 155 in file startup_stm32g070xx.s
 
 EXTI2_3_IRQHandler 00000012
@@ -584,6 +592,12 @@ I2C2_IRQHandler 00000012
 
 Symbol: I2C2_IRQHandler
    Definitions
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
       At line 201 in file startup_stm32g070xx.s
    Uses
       At line 101 in file startup_stm32g070xx.s
@@ -592,12 +606,6 @@ Symbol: I2C2_IRQHandler
 NMI_Handler 00000008
 
 Symbol: NMI_Handler
-
-
-
-ARM Macro Assembler    Page 3 Alphabetic symbol ordering
-Relocatable symbols
-
    Definitions
       At line 127 in file startup_stm32g070xx.s
    Uses
@@ -649,6 +657,12 @@ Symbol: SPI1_IRQHandler
       At line 102 in file startup_stm32g070xx.s
       At line 173 in file startup_stm32g070xx.s
 
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
 SPI2_IRQHandler 00000012
 
 Symbol: SPI2_IRQHandler
@@ -657,12 +671,6 @@ Symbol: SPI2_IRQHandler
    Uses
       At line 103 in file startup_stm32g070xx.s
       At line 174 in file startup_stm32g070xx.s
-
-
-
-ARM Macro Assembler    Page 4 Alphabetic symbol ordering
-Relocatable symbols
-
 
 SVC_Handler 0000000C
 
@@ -714,6 +722,12 @@ TIM17_IRQHandler 00000012
 Symbol: TIM17_IRQHandler
    Definitions
       At line 199 in file startup_stm32g070xx.s
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
    Uses
       At line 99 in file startup_stm32g070xx.s
       At line 170 in file startup_stm32g070xx.s
@@ -722,12 +736,6 @@ TIM1_BRK_UP_TRG_COM_IRQHandler 00000012
 
 Symbol: TIM1_BRK_UP_TRG_COM_IRQHandler
    Definitions
-
-
-
-ARM Macro Assembler    Page 5 Alphabetic symbol ordering
-Relocatable symbols
-
       At line 191 in file startup_stm32g070xx.s
    Uses
       At line 90 in file startup_stm32g070xx.s
@@ -780,18 +788,18 @@ Symbol: USART1_IRQHandler
 
 USART2_IRQHandler 00000012
 
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Relocatable symbols
+
+
 Symbol: USART2_IRQHandler
    Definitions
       At line 205 in file startup_stm32g070xx.s
    Uses
       At line 105 in file startup_stm32g070xx.s
       At line 176 in file startup_stm32g070xx.s
-
-
-
-
-ARM Macro Assembler    Page 6 Alphabetic symbol ordering
-Relocatable symbols
 
 USART3_4_IRQHandler 00000012
 
@@ -811,7 +819,7 @@ Symbol: WWDG_IRQHandler
       At line 77 in file startup_stm32g070xx.s
       At line 151 in file startup_stm32g070xx.s
 
-35 symbols
+36 symbols
 
 
 
@@ -866,4 +874,4 @@ Symbol: __main
       At line 121 in file startup_stm32g070xx.s
 Comment: __main used once
 2 symbols
-386 symbols in table
+387 symbols in table

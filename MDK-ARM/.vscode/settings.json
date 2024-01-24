@@ -26,6 +26,10 @@
         "event_groups.h": "c",
         "hx711.h": "c",
         "string": "c",
-        "pid.h": "c"
+        "pid.h": "c",
+        "bq25895.h": "c",
+        "24cxx.h": "c",
+        "myiic.h": "c",
+        "bq27441.h": "c"
     }
 }

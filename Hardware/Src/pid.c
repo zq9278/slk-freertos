@@ -18,8 +18,8 @@ void HeatPIDInit(float Temp_set)
 	HeatPID.maxIntegral=100;
 	HeatPID.maxOutput=255;
 	
-	HeatPID.Kp=10;
-	HeatPID.Ki=1;
+	HeatPID.Kp=1.3;
+	HeatPID.Ki=0.6;
 	HeatPID.Kd=0;
 	
 }

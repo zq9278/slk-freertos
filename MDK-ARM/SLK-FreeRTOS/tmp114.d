@@ -65,3 +65,5 @@ slk-freertos\tmp114.o: ../Hardware/Inc/pid.h
 slk-freertos\tmp114.o: ../Hardware/Inc/tmp114.h
 slk-freertos\tmp114.o: ../Hardware/Inc/ucs1903.h
 slk-freertos\tmp114.o: ../Hardware/Inc/hx711.h
+slk-freertos\tmp114.o: ../Hardware/Inc/bq27441.h
+slk-freertos\tmp114.o: ../Hardware/Inc/bq25895.h

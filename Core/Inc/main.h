@@ -142,6 +142,8 @@ void Error_Handler(void);
 #include "tmp114.h"
 #include "ucs1903.h"
 #include "hx711.h"
+#include "bq27441.h"
+#include "bq25895.h"
 
 #define Heat_BIT_0 (1 << 0)
 #define SW_BIT_1 (1 << 1)
@@ -152,6 +154,10 @@ void Error_Handler(void);
 #define TMP114Address		0x92
 //#define TMP114Address		0x90
 //#include "retarget.h"
+
+
+#define BQ25895Address	0xd4
+#define BQ27441Address	0xaa
 
 
 

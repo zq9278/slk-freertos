@@ -55,7 +55,7 @@ uart_data uart_RX_data;
 uint8_t rx_index = 0;
 uint8_t last_byte = 0;
 int frame_started = 0;
-// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如�?????????0�?????????
+// const EventBits_t xBitToCheck = Heat_BIT_0; // 比如�??????????0�??????????
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,6 +71,8 @@ int frame_started = 0;
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc1;
 extern ADC_HandleTypeDef hadc1;
+extern DMA_HandleTypeDef hdma_i2c1_rx;
+extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
 extern I2C_HandleTypeDef hi2c1;
@@ -199,6 +201,20 @@ void EXTI4_15_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA1 channel 1 interrupt.
+  */
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA1 channel 2 and channel 3 interrupts.
   */
 void DMA1_Channel2_3_IRQHandler(void)
@@ -206,6 +222,7 @@ void DMA1_Channel2_3_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
 
   /* USER CODE END DMA1_Channel2_3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
   HAL_DMA_IRQHandler(&hdma_i2c2_rx);
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
 
@@ -360,10 +377,10 @@ void USART1_IRQHandler(void)
   //  {
   //    __HAL_UART_CLEAR_IDLEFLAG(&huart1);                                              // 清除空闲中断标志
   //    HAL_UART_DMAStop(&huart1);                                                       // 停止 DMA 传输
-  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�???????????
-  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�???????????
+  //    size_t data_length = sizeof(rx_buffer) - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx); // 算出接本帧数据长�????????????
+  //    xQueueSendFromISR(dataQueueHandle, &rx_buffer, NULL);                            // 在中断中向队列添加数�????????????
   //     HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer,data_length, 0xFFFF);//验证打印数据
-  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�???????????启DMA
+  //    HAL_UART_Receive_DMA(&huart1, rx_buffer, data_length); // 重新�????????????启DMA
   //  }
 
   if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE))
@@ -371,11 +388,11 @@ void USART1_IRQHandler(void)
     uint8_t received_data = (uint8_t)(huart1.Instance->RDR & 0xFF); // ?????UART??
     if (last_byte == 0x5A && received_data == 0xA5)
     {
-      frame_started = 1; // 标记帧的�??????�??????
+      frame_started = 1; // 标记帧的�???????�???????
       uart_RX_data.buffer[0] = 0x5A;
       rx_index = 1; // 重置索引
     }
-    last_byte = received_data; // 更新上一个字�??????
+    last_byte = received_data; // 更新上一个字�???????
     if (frame_started)
     {
       uart_RX_data.buffer[rx_index++] = received_data;
@@ -386,7 +403,7 @@ void USART1_IRQHandler(void)
     __HAL_UART_CLEAR_IDLEFLAG(&huart1);
     // HAL_UART_Transmit(&huart1, (uint8_t *)&rx_buffer, (size_t)rx_index, 0xFFFF); // 验证打印数据
     uart_RX_data.length = rx_index;
-    xQueueSend(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�???????????
+    xQueueSend(dataQueueHandle, &uart_RX_data, NULL); // 在中断中向队列添加数�????????????
     // rx_index = 0;                                            //
     frame_started = 0; // 标记帧的结束
   }
@@ -400,18 +417,18 @@ void USART1_IRQHandler(void)
 /* USER CODE BEGIN 1 */
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
-  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
-  // if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�?????????关检测状�?????????
+  //BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  //EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
+  // if (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0)) // 电机或�?�加热膜有一个事件发生了，都可以进入�??????????关检测状�??????????
   // {
-    // if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�?????????关是否被按下
+    // if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 物理�??????????关是否被按下
     // {
-    //   // 设置事件组的标志�?????????
-    //   if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �?????????关事件是否发�?????????
+    //   // 设置事件组的标志�??????????
+    //   if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �??????????关事件是否发�??????????
     //   {
     //     // 如果SW_BIT_1当前是清除的，那么设置它
     //     // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
-    //     xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�?????????关事件发�?????????
+    //     xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken); // 设置�??????????关事件发�??????????
 
     //     if ((xBits & Motor_BIT_2) != 0)
     //     {
@@ -463,23 +480,24 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 
    
     TickType_t xCurrentTime = xTaskGetTickCountFromISR();
+    EventBits_t xBits = xEventGroupGetBitsFromISR(All_EventHandle);
 
     //if (GPIO_Pin == SW_CNT_Pin) // 假设 SW_CNT_Pin 是你的按键对应的 GPIO pin
     if (HAL_GPIO_ReadPin(SW_CNT_GPIO_Port, SW_CNT_Pin) == 0) // 假设 SW_CNT_Pin 是你的按键对应的 GPIO pin
     {
-      // �?查两次按键事件之间的时间�?
+      // �??查两次按键事件之间的时间�??
       if (xCurrentTime - xLastWakeTime >= pdMS_TO_TICKS(50))
       {                                                                                
-        // 更新上一次按键时�?
+        // 更新上一次按键时�??
         xLastWakeTime = xCurrentTime;
 
-        // 设置事件组的标志�?????????
-        if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �?????????关事件是否发�?????????
+        // 设置事件组的标志�??????????
+        if (((xBits & SW_BIT_1) == 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �??????????关事件是否发�??????????
         {
           // 如果SW_BIT_1当前是清除的，那么设置它
           // xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, pdFALSE);
             //xEventGroupSetBitsFromISR(All_EventHandle, SW_BIT_1, &xHigherPriorityTaskWoken);
-          xEventGroupSetBits(All_EventHandle, SW_BIT_1); // 设置�?????????关事件发�?????????
+          xEventGroupSetBits(All_EventHandle, SW_BIT_1); // 设置�??????????关事件发�??????????
 
           if ((xBits & Motor_BIT_2) != 0)
           {
@@ -500,7 +518,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
             ScreenTimerStart(0x0C);
           }
         }
-         if (((xBits & SW_BIT_1) != 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �?????????关事件是否发�?????????
+         if (((xBits & SW_BIT_1) != 0) && (((xBits & Heat_BIT_0) != 0) || ((xBits & Motor_BIT_2) != 0) || ((xBits & Auto_BIT_3) != 0))) // �??????????关事件是否发�??????????
         {
           // 如果SW_BIT_1当前是设置的，那么清除它
 

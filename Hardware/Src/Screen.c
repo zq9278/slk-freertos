@@ -21,6 +21,7 @@ extern DMA_HandleTypeDef hdma_usart1_tx;
 const EventBits_t xBitsToSet = Heat_BIT_0;
 const EventBits_t xBitsToSet1 = Motor_BIT_2;
 uint8_t SendBuff[12];
+uint8_t SendBuff2[14];
 int32_t ForceRawSet = 422672; // 屏幕设定的值
 
 void processData(PCTRL_MSG msg)
@@ -59,13 +60,20 @@ void processData(PCTRL_MSG msg)
 	// printf("cmd_head: %s, cmd_type: %s, control_type: %s,data2: %s, data: %s\n",
 	//        cmd_head_str, cmd_type_str, control_type_str,data2_str, data_str);
 
+	// uint8_t hexValue = 0xAB;
+	// printf("Hex value: %x\n", hexValue);
+	// uint8_t character = 'A';
+	// printf("Character: %c\n", character);
+	// uint8_t value = 123;
+	// printf("Value: %u\n", (unsigned int)value);
+
 	switch (cmd_type)
 	{
 		/*热敷开始*/
 
 	case 0x1041:
 
-		HeatPIDInit(40.0);
+		HeatPIDInit(43.0);
 		// TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
@@ -75,7 +83,7 @@ void processData(PCTRL_MSG msg)
 	case 0x1030:
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1);		   // enable pwm for heating film
 		xEventGroupClearBits(All_EventHandle, xBitsToSet); // 清除热敷任务开启标志位
-    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
+		xEventGroupClearBits(All_EventHandle, SW_BIT_1);
 		xQueueReset(Temperature_QueueHandle);
 		ScreenWorkModeQuit(0x03);
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
@@ -97,8 +105,8 @@ void processData(PCTRL_MSG msg)
 	case 0x1034:
 		ScreenWorkModeQuit(0x07);
 		xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
-    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
-															// MotorChecking();
+		xEventGroupClearBits(All_EventHandle, SW_BIT_1);
+		// MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
 		// HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
 		// TMC5130_Write(0xa7, 0x10000);
@@ -126,7 +134,7 @@ void processData(PCTRL_MSG msg)
 	case 0x1038:
 		ScreenWorkModeQuit(0x0C);
 		xEventGroupClearBits(All_EventHandle, Auto_BIT_3); // 清除脉动任务开启标志位
-    xEventGroupClearBits(All_EventHandle, SW_BIT_1);
+		xEventGroupClearBits(All_EventHandle, SW_BIT_1);
 		MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
 		HAL_TIM_PWM_Stop(&htim14, TIM_CHANNEL_1); // disable pwm for heating film
@@ -280,8 +288,64 @@ void ScreenUpdateSOC(uint16_t value, uint8_t state)
 	SendBuff[9] = 0xFC;
 	SendBuff[10] = 0xFF;
 	SendBuff[11] = 0xFF;
+HAL_UART_Transmit_DMA(&huart1, SendBuff, 12);
+     vTaskDelay(20);
+	if (value == 100)
+	{
+		SendBuff2[0] = 0xEE;
+		SendBuff2[1] = 0xB1;
+		SendBuff2[2] = 0x10;
+		SendBuff2[3] = 0x00;
+		SendBuff2[4] = 0x01;
+		SendBuff2[5] = 0x00;
+		SendBuff2[6] = 0x04;
+		SendBuff2[7] = value / 100 + '0';
+		SendBuff2[8] = value / 10 % 10 + '0';
+		SendBuff2[9] = value % 10 + '0';
 
-	HAL_UART_Transmit_DMA(&huart1, SendBuff, 12);
+		SendBuff2[10] = 0xFF;
+		SendBuff2[11] = 0xFC;
+		SendBuff2[12] = 0xFF;
+		SendBuff2[13] = 0xFF;
+		HAL_UART_Transmit_DMA(&huart1, SendBuff2, 14);
+	}
+	if (value < 100 && value > 9)
+	{
+		SendBuff2[0] = 0xEE;
+		SendBuff2[1] = 0xB1;
+		SendBuff2[2] = 0x10;
+		SendBuff2[3] = 0x00;
+		SendBuff2[4] = 0x01;
+		SendBuff2[5] = 0x00;
+		SendBuff2[6] = 0x04;
+		SendBuff2[7] = value / 10 % 10 + '0';
+		SendBuff2[8] = value % 10 + '0';
+
+		SendBuff2[9] = 0xFF;
+		SendBuff2[10] = 0xFC;
+		SendBuff2[11] = 0xFF;
+		SendBuff2[12] = 0xFF;
+		HAL_UART_Transmit_DMA(&huart1, SendBuff2, 13);
+	}
+	if (value < 10)
+	{
+		SendBuff2[0] = 0xEE;
+		SendBuff2[1] = 0xB1;
+		SendBuff2[2] = 0x10;
+		SendBuff2[3] = 0x00;
+		SendBuff2[4] = 0x01;
+		SendBuff2[5] = 0x00;
+		SendBuff2[6] = 0x04;
+		SendBuff2[7] = value % 10 + '0';
+
+		SendBuff2[8] = 0xFF;
+		SendBuff2[9] = 0xFC;
+		SendBuff2[10] = 0xFF;
+		SendBuff2[11] = 0xFF;
+		HAL_UART_Transmit_DMA(&huart1, SendBuff2, 12);
+	}
+
+	
 }
 
 void ScreenWorkModeQuit(uint8_t workmodenumber)

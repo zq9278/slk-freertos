@@ -683,6 +683,26 @@
               <FileType>1</FileType>
               <FilePath>..\Hardware\Src\hx711.c</FilePath>
             </File>
+            <File>
+              <FileName>bq25895.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\bq25895.c</FilePath>
+            </File>
+            <File>
+              <FileName>bq27441.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\bq27441.c</FilePath>
+            </File>
+            <File>
+              <FileName>24cxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\24cxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>myiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Hardware\Src\myiic.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

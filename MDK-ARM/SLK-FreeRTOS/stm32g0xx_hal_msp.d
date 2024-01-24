@@ -64,3 +64,5 @@ slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/pid.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/tmp114.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/ucs1903.h
 slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/hx711.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/bq27441.h
+slk-freertos\stm32g0xx_hal_msp.o: ../Hardware/Inc/bq25895.h

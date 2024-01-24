@@ -53,6 +53,11 @@ extern int32_t ForceRawSet;
 int32_t ForceRawActual;
 
 extern TIM_HandleTypeDef htim7;
+
+
+ extern BQ27441_typedef BQ27441;
+  extern uint8_t PowerState;
+  extern uint8_t BQ25895Reg[21];
 /* USER CODE END Variables */
 /* Definitions for Motor_Task */
 osThreadId_t Motor_TaskHandle;
@@ -74,6 +79,13 @@ const osThreadAttr_t Uart_ProcessTas_attributes = {
   .name = "Uart_ProcessTas",
   .priority = (osPriority_t) osPriorityHigh,
   .stack_size = 130 * 4
+};
+/* Definitions for Charge_Task */
+osThreadId_t Charge_TaskHandle;
+const osThreadAttr_t Charge_Task_attributes = {
+  .name = "Charge_Task",
+  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 128 * 4
 };
 /* Definitions for dataQueue */
 osMessageQueueId_t dataQueueHandle;
@@ -104,6 +116,7 @@ const osEventFlagsAttr_t All_Event_attributes = {
 void AppMotor_Task(void *argument);
 void APP_HeatTask(void *argument);
 void App_Uart_ProcessTask(void *argument);
+void App_Charge_Task(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -153,6 +166,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of Uart_ProcessTas */
   Uart_ProcessTasHandle = osThreadNew(App_Uart_ProcessTask, NULL, &Uart_ProcessTas_attributes);
 
+  /* creation of Charge_Task */
+  Charge_TaskHandle = osThreadNew(App_Charge_Task, NULL, &Charge_Task_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -181,7 +197,7 @@ void AppMotor_Task(void *argument)
 
   EventBits_t Motor_Event_Bit;
 
-        TMC5130_Init();
+  TMC5130_Init();
   HX711_Init();
   MotorChecking();
   for (;;)
@@ -199,7 +215,7 @@ void AppMotor_Task(void *argument)
     {
       vTaskDelay(200);
         
-      // printf("电机预模�??");
+      // printf("电机预模�????");
     }
     else if (((Motor_Event_Bit & (Motor_BIT_2 | SW_BIT_1)) == (Motor_BIT_2 | SW_BIT_1)) || (Motor_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式启动）
     { vTaskDelay(200);
@@ -218,7 +234,7 @@ void AppMotor_Task(void *argument)
         vTaskDelay(10);
         break;
       case 2:
-        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�??速度
+        TMC5130_Write(0xa7, 0x8000); // 治疗阶段的回�????速度
         TMC5130_Write(0xa0, 2);
         vTaskDelay(10);
         break;
@@ -262,7 +278,7 @@ void APP_HeatTask(void *argument)
         100                                 // Whether to wait indefinitely
                                             // portMAX_DELAY                      // Whether to wait indefinitely
     );
-    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�???????????
+    //if ((((Heat_Event_Bit & Heat_BIT_0) || ((Heat_Event_Bit & Auto_BIT_3) != 0)) != 0) && ((Heat_Event_Bit & SW_BIT_1) == 0)) // 加热或自动事件发生，按钮事件没发生（预热模式�?????????????
     if((((Heat_Event_Bit & Heat_BIT_0) != 0)||((Heat_Event_Bit & Auto_BIT_3) != 0))&&((Heat_Event_Bit & SW_BIT_1) == 0))
     {
       // // printf("预加热模式\n");
@@ -339,6 +355,33 @@ void App_Uart_ProcessTask(void *argument)
     }
   }
   /* USER CODE END App_Uart_ProcessTask */
+}
+
+/* USER CODE BEGIN Header_App_Charge_Task */
+/**
+* @brief Function implementing the Charge_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_App_Charge_Task */
+void App_Charge_Task(void *argument)
+{
+  /* USER CODE BEGIN App_Charge_Task */
+ 
+    BQ25895_Init(); // 充电芯片初始�?
+    BQ27441_Init();//电量芯片初始�?
+    AT24CXX_Init();//非易失�?�存储芯片初始化
+  /* Infinite loop */
+  for(;;)
+  {
+    
+    BQ25895_MultiRead(BQ25895Reg);//读取充电状态
+    PowerStateUpdate();
+    BQ27441_MultiRead(&BQ27441);//获取电量计数�?
+    ScreenUpdateSOC(BQ27441.SOC,PowerState);//电量上传
+      vTaskDelay(200);
+  }
+  /* USER CODE END App_Charge_Task */
 }
 
 /* Private application code --------------------------------------------------*/

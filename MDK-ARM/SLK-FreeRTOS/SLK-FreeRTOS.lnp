@@ -54,6 +54,10 @@
 "slk-freertos\tmp114.o"
 "slk-freertos\ucs1903.o"
 "slk-freertos\hx711.o"
+"slk-freertos\bq25895.o"
+"slk-freertos\bq27441.o"
+"slk-freertos\24cxx.o"
+"slk-freertos\myiic.o"
 --library_type=microlib --strict --scatter "SLK-FreeRTOS\SLK-FreeRTOS.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
