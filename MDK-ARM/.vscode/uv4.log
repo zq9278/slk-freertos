@@ -1,3 +1,11 @@
-Load "SLK-FreeRTOS\\SLK-FreeRTOS.axf" 
-Erase Done.Programming Done.Verify OK.Application running ...
-Flash Load finished at 13:07:23
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\SoftWare\Keil\ARM\ARMCC\Bin'
+Build target 'SLK-FreeRTOS'
+compiling stm32g0xx_it.c...
+../Hardware/Inc/Screen.h(64): warning:  #1-D: last line of file ends without a newline
+  #endif // 结束 #ifndef �?
+../Core/Src/stm32g0xx_it.c: 1 warning, 0 errors
+linking...
+Program Size: Code=36540 RO-data=692 RW-data=264 ZI-data=9064  
+FromELF: creating hex file...
+"SLK-FreeRTOS\SLK-FreeRTOS.axf" - 0 Error(s), 1 Warning(s).
+Build Time Elapsed:  00:00:01

@@ -73,7 +73,7 @@ void processData(PCTRL_MSG msg)
 
 	case 0x1041:
 
-		HeatPIDInit(43.0);
+		HeatPIDInit(41.0);
 		// TMP114_Init();
 		xEventGroupSetBits(All_EventHandle, xBitsToSet); // 设定热敷任务开启标志位
 		HAL_TIM_PWM_Start(&htim14, TIM_CHANNEL_1);		 // enable pwm for heating film
@@ -106,12 +106,12 @@ void processData(PCTRL_MSG msg)
 		ScreenWorkModeQuit(0x07);
 		xEventGroupClearBits(All_EventHandle, xBitsToSet1); // 清除脉动任务开启标志位
 		xEventGroupClearBits(All_EventHandle, SW_BIT_1);
-		// MotorChecking();
 		HAL_TIM_Base_Stop_IT(&htim7);
-		// HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
-		// TMC5130_Write(0xa7, 0x10000);
-		// TMC5130_Write(0xa0, 2);
-		MotorChecking();
+	
+		//MotorChecking();
+		HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_RESET); // 使能tmc电机引脚
+            TMC5130_Write(0xa7, 0x8000);
+            TMC5130_Write(0xa0, 2);
 		xQueueReset(Force_QueueHandle);
 		break;
 
@@ -154,8 +154,9 @@ void ProcessTemperatureData(uint16_t work_mode)
 		if (buffer_index == 0)
 		{
 			float filtered_temperature = processFilter(temperature_buffer);
-			ScreenUpdateTemperature(filtered_temperature, work_mode);
-			ScreenUpdateTemperature(filtered_temperature, 0x0302);
+			printf("Temperature:%f,%f\n",filtered_temperature,42.5);
+			//ScreenUpdateTemperature(filtered_temperature, work_mode);
+			//ScreenUpdateTemperature(filtered_temperature, 0x0302);
 		}
 	}
 }
@@ -169,7 +170,7 @@ void ProcessForceData(uint16_t work_mode)
 		{
 			uint32_t filtered_Force = processFilter_force(Force_buffer);
 			ScreenUpdateForce(filtered_Force, work_mode);
-			ScreenUpdateForce(filtered_Force, 0x0702);
+			//ScreenUpdateForce(filtered_Force, 0x0702);
 		}
 	}
 }

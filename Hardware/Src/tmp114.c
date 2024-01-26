@@ -9,7 +9,7 @@ float EyeTmp;
 
 extern I2C_HandleTypeDef hi2c2;
 
-
+//#define TMP114Address		0x92
 
 void TMP114_Init(void)
 { 

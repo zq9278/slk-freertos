@@ -245,6 +245,11 @@ void AppMotor_Task(void *argument)
       Force_Q = (ForceRawActual - ForceRawOffset < 0) ? 0 : (ForceRawActual - ForceRawOffset);
       xQueueSend(Force_QueueHandle, &Force_Q, NULL);
     }
+    else if ((((Motor_Event_Bit & Motor_BIT_2) == 0) || ((Motor_Event_Bit & Auto_BIT_3) == 0)) && ((Motor_Event_Bit & SW_BIT_1) == 0)) // 脉动或�?�自动事件发生，按钮事件发生（正式脉动模式启动）
+    {
+      vTaskDelay(5000 );
+HAL_GPIO_WritePin(TMC_ENN_GPIO_Port, TMC_ENN_Pin, GPIO_PIN_SET); // 能tmc电机引脚
+    }
 
     // TMC5130_Write(0xa0, 1); // 设置tmc电机方向向前
     // vTaskDelay(1000);
@@ -284,7 +289,7 @@ void APP_HeatTask(void *argument)
       // // printf("预加热模式\n");
         HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
       start_Heat(Temperature_QueueHandle);
-      vTaskDelay(200);
+      vTaskDelay(20);
     }
     else if (((Heat_Event_Bit & (Heat_BIT_0 | SW_BIT_1)) == (Heat_BIT_0 | SW_BIT_1)) || ((Heat_Event_Bit & (Auto_BIT_3 | SW_BIT_1)) == (Auto_BIT_3 | SW_BIT_1))) // 加热或�?�自动事件发生，按钮事件发生（正式加热模式�?
     {
@@ -292,6 +297,8 @@ void APP_HeatTask(void *argument)
       start_Heat(Temperature_QueueHandle);
       vTaskDelay(200);
     }
+    
+
   }
 
   /* USER CODE END APP_HeatTask */
